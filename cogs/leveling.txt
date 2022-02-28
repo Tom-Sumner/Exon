@@ -1,0 +1,70 @@
+import nextcord, os, sys, colorama, time, asyncio, requests, pyodbc
+from colorama import init, Fore, Back, Style
+from termcolor import colored
+from zmq import Message
+init()
+sys.path.insert(1, "..")
+import utils
+from utils import EmbedColors, Images, pallate, token, tokens, fetch
+from nextcord import ChannelType, Embed, TextChannel, slash_command, Webhook
+from nextcord.utils import get
+from nextcord.ext import commands
+from nextcord.ext.commands.errors import MissingPermissions, MissingRole, CommandNotFound
+from nextcord import Interaction, SlashOption
+from nextcord.abc import *
+import aiohttp
+
+class DB:
+    conn = pyodbc.connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=C:/Users/tomsu/OneDrive/Documents/Programming/Exon/Working/test.accdb;") 
+    c = conn.cursor()
+    def UserCheck(user):
+        query = DB.c.execute(f"SELECT * FROM [User Levels] WHERE [USer ID]={user.id}")
+        if query.fetchall() != None or () or []:
+            pass
+        else:
+            DB.c.execute(f"INSERT INTO [User Leveles] (level, [User ID]) VALUES (0, {user.id})")
+    class write:
+        def MsgCount(user: nextcord.Member, MsgCount: int):
+            query = DB.c.execute(f"INSERT INTO [User Levels] ([msg count]) VALUES ({MsgCount}) WHERE [User Levels].[User ID] = {user.id}")
+        def level(user: nextcord.Member, level):
+            query = DB.c.execute(f"INSERT INTO [User Levels] (level) VALUES ({level}) WHERE [User Levels].[User ID] = {user.id}")
+    class read:
+        def MsgCount(user: nextcord.Member):
+            DB.UserCheck(user)
+            first = DB.c.execute(f"SELECT [User Levels].[msg count] FROM [User Levels] WHERE [User Levels].[User ID] = {user.id}")
+            result = f"{DB.c.fetchone()}"[-0:-3].replace("(", "")
+            return result
+        def level(user: nextcord.Member):
+            DB.UserCheck(user)
+            first = DB.c.execute(f"SELECT [User Levels].level FROM [User Levels] WHERE [User Levels].[User ID] = {user.id}")
+            result = f"{DB.c.fetchone()}"[-0:-3].replace("(", "")
+            return result
+    class update:
+        def MsgCount(user: nextcord.Member):
+            CurrentLevel = int(DB.read.level(user))
+            CurrentMsgCount = int(DB.read.MsgCount(user))
+            MsgCount = CurrentMsgCount + 1
+            for key, value in utils.MsgTargets.items():
+                if value < MsgCount:
+                    
+                    
+# Define the Cog
+class Leveling(commands.Cog):
+    def __init__(self, client):
+        self.client: nextcord.Client = client
+
+    @nextcord.slash_command(name="level", description="Check your current level", guild_ids=[941810207804260352])
+    async def CheckLevel(self, ctx: Interaction):
+        level = DB.read.level(ctx.user)
+        embed=nextcord.Embed(color=EmbedColors.notify, title=f"Level: {level}", description=f"Hey {ctx.user.display_name}, you are level {level}")
+        embed.set_footer(text=ctx.user.display_name, icon_url=ctx.user.display_avatar.url)
+        await ctx.send(embed=embed)
+        
+        
+    @commands.Cog.listener()
+    async def on_message(self, msg: nextcord.Message):
+        DB.update.MsgCount(msg.author)
+
+# Setup the Cog
+def setup(client):
+    client.add_cog(Leveling(client))
