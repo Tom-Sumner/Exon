@@ -17,7 +17,7 @@
 
 
 #### Thanks To
-- [Sikenz Hosting](https://hosting.sinkezstudios.com)
+- [Sinkez Hosting](https://hosting.sinkezstudios.com)
 
 
 ### License
