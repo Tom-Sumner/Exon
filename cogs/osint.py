@@ -22,7 +22,7 @@ class Osint(commands.Cog):
     async def osint(self, ctx: Interaction, target: nextcord.User):
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bot {utils.tokens["3"}",
+            "Authorization": f"Bot {utils.tokens["3"}"
         }
         target = self.client.get_user(target.id)
         id = target.id
