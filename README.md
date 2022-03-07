@@ -1,18 +1,19 @@
 
 # Exon
 
- Exon provides a multitude of user friendly commands, including full slash command functionality and buttons, dropdowns, message commands and forms.
+ Exon provides a multitude of user-friendly commands, including full slash command functionality and buttons, dropdowns, message commands and forms.
 
 
 ## Links
 
  - [Website](https://sites.google.com/view/exon-bot)
  - [Invite to server](https://discord.com/oauth2/authorize?client_id=931158201779486730&permissions=1644972474359&scope=bot%20applications.commands)
+ - [Help Server](https://discord.gg/invite/54DTY7hv)
 
 
 ## Authors
 
-- [@CodeNeck-1](https://www.github.com/CodeNeck-1)
+- [VasilyCodes](https://www.github.comVasilyCodes)
 - [@Root-5](https://www.github.com/Root-5)
 
 
