@@ -13,7 +13,7 @@
 
 ## Authors
 
-- [VasilyCodes](https://www.github.comVasilyCodes)
+- [@VasilyCodes](https://www.github.comVasilCodes)
 - [@Root-5](https://www.github.com/Root-5)
 
 
