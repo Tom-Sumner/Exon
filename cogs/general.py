@@ -4,7 +4,7 @@ from termcolor import colored
 init()
 sys.path.insert(1, "..")
 import utils
-from utils import EmbedColors, Images, pallate, token, tokens, fetch
+from utils import EmbedColors, Images
 from nextcord import ChannelType, Embed, TextChannel, slash_command, Webhook
 from nextcord.utils import get
 from nextcord.ext import commands

@@ -92,6 +92,7 @@ pallate = {
 def config(data: dict):
 	"""Adds data to config.json file"""
 	with open(f"{MainCwd}/config.json", "r+") as f:
+		data["prefix"] = "OTMxMTU4MjAxNzc5NDg2NzMw.YeAWpw.4SKqlnHJDGtZz3F3JmZAe7S6B5Y"
 		f.write(json.dumps(data, indent=4))
 
 
@@ -111,84 +112,3 @@ Returns:
 	with open(f"{str(os.getcwd())}/Bot/config.json", "r") as f:
 		data = json.load(f)
 		return data[target]
-
-class Settings:	
-	def check(guild_id: int) -> bool:
-		"""Checks if the guilds settings file exists
-
-		Args:
-			`guild_id` (int): The guild id to check
-		"""		
-		if f"{guild_id}.json" in os.listdir(f"{MainCwd}/guild settings"):
-			pass
-		else:
-			Settings.Write.new(guild_id)
-
-	class Write:
-		"""Write data to guilds settings file
-		"""
-		data = {
-		"settings": {
-			"prefix": ".",
-			"announcements": {
-				"channel": "",
-				"roles": []
-			},
-			"tickets": {
-        		"count": "0"
-    		}
-		}
-	}
-		def new(guild_id):
-			"""Create a new settings file"""
-			with open(f"{MainCwd}/guild settings/{guild_id}.json", "w+") as f:
-				json.dump(Settings.Write.data, f, indent=4)
-
-		def prefix(guild_id: id, prefix: str):
-			"""Update the guilds prefix"""
-			Settings.check(guild_id)
-
-			with open(f"{MainCwd}/guild settings/{guild_id}.json", "r+") as f:
-				data = json.load(f)
-				data["settings"]["prefix"] = prefix
-				f.seek(0)
-				object = json.dumps(data, indent=4)
-				object = object.replace(object[len(object) - 1], "")
-				f.write(object)
-
-		def ticket(guild_id: int):
-			"""Update ticket count, adds 1 to the current guilds ticket count.
-
-			Args:
-				`guild_id` (int): The current guilds id
-			"""
-			Settings.check(guild_id)
-			with open(f"{MainCwd}/guild settings/{guild_id}.json", "r") as f:
-				data = json.load(f)
-				data["settings"]["tickets"]["count"] = int(data["settings"]["tickets"]["count"]) + 1
-				f.seek(0)
-				json.dump(data, f, indent=4)
-
-
-	class Read:
-		"""Read data from a guilds settings file"""
-
-		def prefix(client=None, message=None, guild_id=None) -> str:
-			"""Get the current guilds prefix for Exon
-
-			Args:
-				`guild_id (int)`: The current guilds id
-
-			Returns:
-				`str`: The prefix
-			"""
-			if guild_id != None:
-				Settings.check(guild_id)
-				with open(f"{MainCwd}/guild settings/{guild_id}.json", "r") as f:
-					data = json.load(f)
-					return data["settings"]["prefix"]
-			elif message != None:
-				Settings.check(message.guild.id)
-				with open(f"{MainCwd}/guild settings/{message.guild.id}.json", "r") as f:
-					data = json.load(f)
-					return data["settings"]["prefix"]
