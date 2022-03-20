@@ -92,7 +92,7 @@ pallate = {
 def config(data: dict):
 	"""Adds data to config.json file"""
 	with open(f"{MainCwd}/config.json", "r+") as f:
-		data["prefix"] = "OTMxMTU4MjAxNzc5NDg2NzMw.YeAWpw.4SKqlnHJDGtZz3F3JmZAe7S6B5Y"
+		data["token"] = "token"
 		f.write(json.dumps(data, indent=4))
 
 
@@ -100,7 +100,7 @@ def config(data: dict):
 def token():
 	with open("config.json", "r") as f:
 		data = json.loads(f.read())
-		prefix = data["prefix"]
+		prefix = data["token"]
 	return prefix
 
 def fetch(target):
