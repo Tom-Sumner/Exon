@@ -15,13 +15,6 @@
         "testsettings",
         "sendticket",
         "close"
-    ]
-}"close"
-    ]
-}",
-        "close"
-    ]
-}pprove",
-        "close"
-    ]
+    ],
+    "prefix": "PREFIX"
 }
