@@ -89,50 +89,18 @@ pallate = {
 	"cmd": EmbedColors.notify
 }
 
-tokens = {
-	"3": "OTMxMTU4MjAxNzc5NDg2NzMw.YeAWpw.ZBLhTJaMw--oDRRqKmm5buTQLKI",
-	"4": "OTM3MTE5Njk0NjE0MzI3MzQ2.YfXGug.SgfizuolZhwSU5npSGrtU_6HkXI"
-}
-
 def config(data: dict):
 	"""Adds data to config.json file"""
 	with open(f"{MainCwd}/config.json", "r+") as f:
 		f.write(json.dumps(data, indent=4))
 
 
-MsgTargets = {
- 1: 5,
- 2: 10,
- 3: 20,
- 4: 40,
- 5: 65,
- 6: 100,
- 7: 140,
- 8: 180,
- 9: 250,
- 10: 300,
- 11: 380,
- 12: 470,
- 13: 580,
- 14: 700,
- 15: 1000
-}
-
 
 def token():
-# 	print("""
-# Tokens:
-# 	Maciej's: 1
-# 	Tom's: 2
-# 	Exon's: 3
-# 	Exon BETA's: 4
-# 	""")
-	# wanted = input("Enter a number to choose\n>>>  ")
-	# TOKEN = tokens[wanted]
-	if "Working" in os.listdir(os.getcwd()):
-		return "OTM3MTE5Njk0NjE0MzI3MzQ2.YfXGug.SgfizuolZhwSU5npSGrtU_6HkXI"
-	else:
-		return "OTMxMTU4MjAxNzc5NDg2NzMw.YeAWpw.hRYRrWYBSH_IwllskdWgpToxtuc"
+	with open("config.json", "r") as f:
+		data = json.loads(f.read())
+		prefix = data["prefix"]
+	return prefix
 
 def fetch(target):
 	"""Fetch data from config.json
@@ -143,17 +111,6 @@ Returns:
 	with open(f"{str(os.getcwd())}/Bot/config.json", "r") as f:
 		data = json.load(f)
 		return data[target]
-
-
-# class Exon:
-# 	name = fetch_exon("name")
-# 	discrim = fetch_exon("discriminator")
-# 	HelpServer = fetch_exon("help server id")
-# 	JoinChannel = fetch_exon("guild join channel id")
-# 	LogChannel = fetch_exon("bot logs channel id")
-# 	StatusChannel = fetch_exon("status channel id")
-# 	AnnouncementsChannel = fetch_exon("announcement channel id")
-# 	all = [name, discrim, HelpServer, JoinChannel, LogChannel, StatusChannel, AnnouncementsChannel]
 
 class Settings:	
 	def check(guild_id: int) -> bool:
