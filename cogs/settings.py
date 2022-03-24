@@ -92,9 +92,8 @@ class Home(nextcord.ui.Select):
 					description=f"Change prefix for {ctx.guild.name}"), view=EditPrefix(client=self.client))
 			pass
 		elif self.values[0] == "welcome":
-			msg = await ctx.send(embed=nextcord.Embed(color=EmbedColors.error, title="Coming Soon...",
+			await ctx.response.send_message(ephemeral=True, embed=nextcord.Embed(color=EmbedColors.error, title="Coming Soon...",
 				description="This setting will be coming in the near future"))
-			await msg.delete()
 		else:
 			pass
 
