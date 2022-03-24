@@ -45,55 +45,57 @@ class Admin(commands.Cog):
 	channel: GuildChannel=SlashOption(name="channel", description="The channel to delete all messages in", required=False),
 	user: Member=SlashOption(name="user", description="The user to delete all messages they sent", required=False)):
 		await ctx.response.defer(ephemeral=True)
-		embed: nextcord.Embed = nextcord.Embed(
-			color=EmbedColors.notify,
-			title=f":white_check_mark:", 
-			description="")
-		embed.set_footer(text=ctx.user.display_name, icon_url=ctx.user.display_avatar.url)
+		if ctx.user.guild_permissions.manage_channels:
+			embed: nextcord.Embed = nextcord.Embed(
+				color=EmbedColors.notify,
+				title=f":white_check_mark:", 
+				description="")
+			embed.set_footer(text=ctx.user.display_name, icon_url=ctx.user.display_avatar.url)
 
-		async def default(ctx: Interaction):
-			await ctx.channel.purge()
+			async def default(ctx: Interaction):
+				await ctx.channel.purge()
 
-		async def User(ctx: Interaction, user:Member):
-			async for message in ctx.channel.history():
-				if message.author == user:
-					await message.delete()
+			async def User(ctx: Interaction, user:Member):
+				async for message in ctx.channel.history():
+					if message.author == user:
+						await message.delete()
+					else:
+						pass
+
+			async def Channel(ctx:Interaction, channel:GuildChannel):
+				await channel.purge()
+
+			async def ChannelAndUser(ctx: Interaction, channel:GuildChannel, user:Member):
+				async for message in channel.history():
+					if message.author == user:
+						await message.delete()
+					else:
+						pass
+
+			if channel == None:
+				if user == None:
+					await default(ctx)
+					embed.description = f"{ctx.channel.mention} has been purged!"
 				else:
+					await User(ctx, user)
+					embed.description = f"All messages from {user.mention} have been deleted in {ctx.channel.mention}"
+			elif user == None:
+				if channel == None:
 					pass
-
-		async def Channel(ctx:Interaction, channel:GuildChannel):
-			await channel.purge()
-
-		async def ChannelAndUser(ctx: Interaction, channel:GuildChannel, user:Member):
-			async for message in channel.history():
-				if message.author == user:
-					await message.delete()
 				else:
-					pass
-
-		if channel == None:
-			if user == None:
+					await Channel(ctx, channel)
+					embed.description = f"{ctx.channel.mention} has been purged!"
+			elif user and channel != None:
+				await ChannelAndUser(ctx, channel, user)
+				embed.description = f"All messages from {user.mention} have been deleted in {channel.mention}"
+			else:
 				await default(ctx)
 				embed.description = f"{ctx.channel.mention} has been purged!"
-			else:
-				await User(ctx, user)
-				embed.description = f"All messages from {user.mention} have been deleted in {ctx.channel.mention}"
-		elif user == None:
-			if channel == None:
-				pass
-			else:
-				await Channel(ctx, channel)
-				embed.description = f"{ctx.channel.mention} has been purged!"
-		elif user and channel != None:
-			await ChannelAndUser(ctx, channel, user)
-			embed.description = f"All messages from {user.mention} have been deleted in {channel.mention}"
+
+
+			msg = await ctx.send(embed=embed)
 		else:
-			await default(ctx)
-			embed.description = f"{ctx.channel.mention} has been purged!"
-
-
-		msg = await ctx.send(embed=embed)
-		time.sleep(1)
+			await ctx.send(ephemeral=True, content="You dont have permission to use this command!")
 
 
 
