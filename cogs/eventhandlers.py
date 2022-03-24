@@ -9,14 +9,42 @@ from utils import EmbedColors, Images
 from nextcord import slash_command
 from nextcord.utils import get
 from nextcord.ext import commands
-from nextcord.ext.commands.errors import MissingPermissions, MissingRole, CommandNotFound
+from nextcord.ext.commands.errors import MissingPermissions, MissingRole, CommandNotFound, MissingRequiredArgument
 from nextcord import Interaction, SlashOption
 from nextcord.abc import *
 
 # Define the Cog
 class ErrorHandlers(commands.Cog):
 	def __init__(self, client):
-		self.client: client = client
+		self.client: nextcord.Client = client
+
+	@commands.Cog.listener()
+	async def on_command_error(self, ctx, error):
+		if isinstance(error, CommandNotFound):
+			msg = await ctx.send("This command does not exist.")
+			asyncio.sleep(5)
+			await msg.delete()
+
+		elif isinstance(error, MissingPermissions):
+			await ctx.send(f"You dont have the necessary permissions to run this command\nNeeded perms: {error.missing_permissions}")
+			asyncio.sleep(5)
+			await msg.delete()
+
+		elif isinstance(error, MissingRole):
+			await ctx.send(f"You dont have the necessary roles to run the command\nNeeded roles: {error.missing_role}")
+			asyncio.sleep(5)
+			await msg.delete()
+
+		elif isinstance(error, MissingRequiredArgument):
+			await ctx.send(f"{error}")
+			await asyncio.sleep(5)
+			await msg.delete()
+
+		else:
+			await ctx.send("Something went badly wrong while running the command!")
+			owner = await self.client.fetch_user(683700720515416065)
+			await owner.send(f"Something went terribly wrong, sort me out!")
+			await owner.send(error)
 
 class EventHandlers(commands.Cog):
 	def __init__(self, client):
