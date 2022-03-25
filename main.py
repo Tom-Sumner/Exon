@@ -58,15 +58,15 @@ else:
 
 @client.event
 async def on_message(message: nextcord.Message):
-	if "Working" in os.listdir(os.getcwd()):
-		if message.content.startswith("test."):
+	print(f"{message.author.display_name}: {message.content}")
+	try:
+		id = message.guild.id
+		if message.content.startswith(dbutils.fetch_prefix(guild_id=id)):
 			await asyncio.sleep(5)
 			await message.delete()
-	else:
-		if message.content.startswith(dbutils.fetch_prefix(guild_id=(message.guild.id))):
-			await asyncio.sleep(5)
-			await message.delete()
-	await client.process_commands(message)
+		await client.process_commands(message)
+	except Exception as e:
+		print("Error	", e)
 
 CogList = []
 def LoadCogs():
