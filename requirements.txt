@@ -1,3 +1,4 @@
-nextcord
+git+https://github.com/nextcord/nextcord
 colorama
 termcolor
+sqlite3
