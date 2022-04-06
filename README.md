@@ -14,7 +14,7 @@
 ## Authors
 
 - [@Tom Sumner](https://www.github.com/Tom-Sumner)
-- [@Root-5](https://www.github.com/Root-5)
+- [@Maciej-JS](https://github.com/Maciej-JS)
 
 
 #### Thanks To
