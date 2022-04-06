@@ -22,21 +22,21 @@ class ErrorHandlers(commands.Cog):
 	async def on_command_error(self, ctx, error):
 		if isinstance(error, CommandNotFound):
 			msg = await ctx.send("This command does not exist.")
-			asyncio.sleep(5)
+			await asyncio.sleep(5)
 			await msg.delete()
 
 		elif isinstance(error, MissingPermissions):
-			await ctx.send(f"You dont have the necessary permissions to run this command\nNeeded perms: {error.missing_permissions}")
-			asyncio.sleep(5)
+			msg = await ctx.send(f"You dont have the necessary permissions to run this command\nNeeded perms: {error.missing_permissions}")
+			await asyncio.sleep(5)
 			await msg.delete()
 
 		elif isinstance(error, MissingRole):
-			await ctx.send(f"You dont have the necessary roles to run the command\nNeeded roles: {error.missing_role}")
-			asyncio.sleep(5)
+			msg = await ctx.send(f"You dont have the necessary roles to run the command\nNeeded roles: {error.missing_role}")
+			await asyncio.sleep(5)
 			await msg.delete()
 
 		elif isinstance(error, MissingRequiredArgument):
-			await ctx.send(f"{error}")
+			msg = await ctx.send(f"{error}")
 			await asyncio.sleep(5)
 			await msg.delete()
 
@@ -76,7 +76,8 @@ class EventHandlers(commands.Cog):
 
 	# Auto delete commands
 	@commands.Cog.listener()
-	async def on_message(self, msg: nextcord.Message):
+	async def on_message(self, message: nextcord.Message):
+		msg = message
 		if msg.author == self.client.user:
 			pass
 		else:
@@ -98,6 +99,13 @@ class EventHandlers(commands.Cog):
 				await msg.channel.send(embeds=[embed1, embed2])
 			else:
 				pass
+	
+	# @commands.Cog.listener()
+	# async def on_member_join(self, member: nextcord.Member):
+	# 	message = dbutils.fetch_welcome_message(member.guild.id)
+	# 	message = message.replace(";user;", member.mention).replace(";guild;", member.guild.name)
+	# 	await member.send(message)
+		
 
 # Setup the Cog
 def setup(client):

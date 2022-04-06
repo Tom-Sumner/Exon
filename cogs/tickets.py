@@ -3,8 +3,8 @@ from colorama import init, Fore, Back, Style
 from termcolor import colored
 init()
 sys.path.insert(1, "..")
-import utils
-from utils import EmbedColors, Images
+import utils, dbutils
+from utils import EmbedColors, Images, pallate, token, tokens, fetch
 from nextcord import slash_command
 from nextcord.utils import get
 from nextcord.ext import commands
@@ -16,13 +16,13 @@ class Button(nextcord.ui.View):
 	def __init__(self):
 		super().__init__(timeout=None)
 
-	@nextcord.ui.button(label="New Ticket", style=nextcord.ButtonStyle.blurple, custom_id="create_ticket")
+	@nextcord.ui.button(label="New Ticket", style=nextcord.ButtonStyle.blurple, custom_id="new_ticket")
 	async def create(self, button: nextcord.ui.Button, ctx: Interaction):
-		await ctx.response.defer(ephemeral=True)
+		await ctx.response.send_message(ephemeral=True, content="Your ticket is being created now....")
 
 		ticket_created_embed = nextcord.Embed(
 			title="Ticket Processed",
-			description=f"""Hey {ctx.user.name}! Thanks for opening a ticket with us today.
+			description=f"""Hey {ctx.user.mention}! Thanks for opening a ticket with us today.
 			Please describe your enquiry and our team will respond shortly. We thank you in advance for your patience."""
 		)
 
@@ -31,11 +31,11 @@ class Button(nextcord.ui.View):
 			ctx.user: nextcord.PermissionOverwrite(view_channel=True),
 			ctx.guild.me: nextcord.PermissionOverwrite(view_channel=True)
 		}
+		count = dbutils.fetch_ticket_count(guild_id=ctx.channel.guild.id)
+		dbutils.update_ticket_count(guild_id=ctx.channel.guild.id, count=count + 1)
+		ticket = await ctx.channel.category.create_text_channel(f"ticket-{count}", overwrites=overwrites)
 
-		ticket = await ctx.channel.category.create_text_channel(f"{ctx.user.display_name}'s ticket", overwrites=overwrites)
-
-		await ticket.send(ctx.user.mention, embed=ticket_created_embed)
-		self.stop()
+		await ticket.send(embed=ticket_created_embed)
 
 # Define the Cog
 class SimpleTicket(commands.Cog):
@@ -50,7 +50,7 @@ class SimpleTicket(commands.Cog):
 			self.persistent_views_added = True
 
 	@commands.command()
-	@commands.is_owner()
+	@commands.has_permissions(manage_channels=True, administrator=True)
 	async def sendticket(self, ctx):
 		embed = nextcord.Embed(
 			title="Contact Support",
@@ -64,6 +64,12 @@ class SimpleTicket(commands.Cog):
 	async def close(self, ctx):
 		await ctx.send("Please confirm to delete the message", view=Confirm(ctx.author))
 
+	@commands.command()
+	@commands.has_guild_permissions(administrator=True)
+	async def add(self, ctx, user: nextcord.User):
+		await ctx.send(f"{user.mention} has been added to the ticket")
+		await ctx.channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
+
 
 class Confirm(nextcord.ui.View):
 	def __init__(self, user):
@@ -76,10 +82,11 @@ class Confirm(nextcord.ui.View):
 		if ctx.user != self.user:
 			await ctx.response.send_message("This is not your choice to make!")
 		channel: nextcord.TextChannel = ctx.channel
-		await ctx.response.send_message(f"{channel.mention} is being deleted")
-		asyncio.sleep(5)
-		if channel.name.endswith("ticket"):
-				await ctx.channel.delete()
+		if channel.name.startswith("ticket"):
+			await ctx.channel.delete()
+			await ctx.response.send_message(f"{channel.mention} is being deleted")
+		else:
+			await ctx.response.send_message("This is not a ticket channel")
 		self.stop()
 
 	@nextcord.ui.button(label="Cancel", style=nextcord.ButtonStyle.green)
@@ -97,3 +104,4 @@ class Confirm(nextcord.ui.View):
 # Setup the Cog
 def setup(client):
 	client.add_cog(SimpleTicket(client))
+

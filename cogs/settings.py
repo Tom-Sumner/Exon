@@ -4,7 +4,7 @@ from termcolor import colored
 init()
 sys.path.insert(1, "..")
 import utils, dbutils
-from utils import EmbedColors, Images
+from utils import EmbedColors, Images, pallate, token, tokens, fetch
 from nextcord import ChannelType, TextChannel, slash_command, Webhook
 from nextcord.utils import get
 from nextcord.ext import commands
@@ -12,6 +12,51 @@ from nextcord.ext.commands.errors import MissingPermissions, MissingRole, Comman
 from nextcord import Interaction, SlashOption
 from nextcord.abc import *
 
+class welcome_message_prompt(nextcord.ui.Modal):
+	def __init__(self):
+		super().__init__("Change Welcome Message", timeout=5 * 60)
+
+		self.message = nextcord.ui.TextInput(
+			label="New Welcome Message",
+			style=nextcord.TextInputStyle.paragraph, 
+			placeholder="Use ;user; to mention the user and ;guild; to mention the guild", 
+			required=True
+		)
+		
+		self.add_item(self.message)
+
+	async def callback(self, ctx: Interaction):
+		dbutils.update_welcome_message(ctx.user.guild.id, self.message.value)
+		await ctx.send(ephemeral=True, content="The welcome message has been updated!")
+
+class EditWelcomeMessage(nextcord.ui.View):
+	def __init__(self, client):
+		super().__init__()
+		self.value = None
+		self.client = client
+
+	@nextcord.ui.button(label="Edit Welcome Message", style=nextcord.ButtonStyle.blurple)
+	async def edit(self, button: nextcord.ui.Button, ctx: nextcord.Interaction):
+		await ctx.response.send_modal(welcome_message_prompt())
+		await ctx.edit_original_message(
+			embed=nextcord.Embed(color=EmbedColors.notify,
+			title="Settings",
+			description="Configure settings for this guild"),
+		view=HomeView(self.client))
+		self.value = True
+		self.stop()
+
+	@nextcord.ui.button(label="Cancel", style=nextcord.ButtonStyle.red)
+	async def cancel(self, button: nextcord.ui.Button, ctx: nextcord.Interaction):
+		channel: nextcord.TextChannel = ctx.channel
+		await ctx.response.edit_message(
+			embed=nextcord.Embed(color=EmbedColors.notify,
+			title="Settings",
+			description="Configure settings for this guild"),
+		view=HomeView())
+		
+		self.value = True
+		self.stop()
 
 class EditPrefix(nextcord.ui.View):
 	def __init__(self, client):
@@ -79,19 +124,12 @@ class Home(nextcord.ui.Select):
 					description=f"Change prefix for {ctx.guild.name}"), view=EditPrefix(client=self.client))
 			pass
 		elif self.values[0] == "welcome":
-			await ctx.response.send_message(ephemeral=True, embed=nextcord.Embed(color=EmbedColors.error, title="Coming Soon...",
-				description="This setting will be coming in the near future"))
+			await ctx.response.edit_message(embed=nextcord.Embed(
+					color=EmbedColors.notify,
+					title="Welcome Message Settings",
+					description=f"Change welcome message for {ctx.guild.name}"), view=EditWelcomeMessage(client=self.client))
 		else:
 			pass
-
-class Finished(nextcord.ui.View):
-	def __init__(self, client):
-		super().__init__()
-		self.value = None
-		self.client = client
-	@nextcord.ui.button(label="Finished Editing", style=nextcord.ButtonStyle.blurple)
-	async def finished(self, button: nextcord.ui.Button, ctx: nextcord.Interaction):
-		await ctx.delete_original_message(delay=5)
 
 class HomeView(nextcord.ui.View):
 	def __init__(self, client):
@@ -104,12 +142,12 @@ class Settings(commands.Cog):
 		self.client: nextcord.Client = client
 
 	@commands.command()
-	async def settings(self, ctx: commands.Context):
-		views = HomeView(client=self.client), Finished(client=self.client)
+	async def settings(self, ctx):
 		await ctx.send(
 			embed=nextcord.Embed(color=EmbedColors.notify,
 			title="Settings",
-			description="Configure settings for this guild"), view=views)
+			description="Configure settings for this guild"),
+		view=HomeView(client=self.client))
 
 	async def wait_for(event, user):
 		result = await Settings.__init__().wait_for(event)

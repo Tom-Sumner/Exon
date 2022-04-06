@@ -1,11 +1,12 @@
 import re
+from discord import TextChannel
 import nextcord, os, sys, colorama, time, asyncio, json
 from colorama import init, Fore, Back, Style
 from termcolor import colored
 init()
 sys.path.insert(1, "..")
 import utils
-from utils import EmbedColors, Images
+from utils import EmbedColors
 from nextcord import Guild, Member, WebhookMessage, slash_command
 from nextcord.utils import get
 from nextcord.ext import commands
@@ -43,87 +44,87 @@ class Admin(commands.Cog):
 	@nextcord.slash_command(name="purge", description="Delete all messages from a certain user or channel", default_permission=False)
 	async def purge(self, ctx: Interaction, 
 	channel: GuildChannel=SlashOption(name="channel", description="The channel to delete all messages in", required=False),
-	user: Member=SlashOption(name="user", description="The user to delete all messages they sent", required=False)):
+	user: Member=SlashOption(name="user", description="The user to delete all messages they sent", required=False),
+	count: int=SlashOption(name="count", description="The count of messages to delete", required=False)):
 		await ctx.response.defer(ephemeral=True)
-		if ctx.user.guild_permissions.manage_channels:
-			embed: nextcord.Embed = nextcord.Embed(
-				color=EmbedColors.notify,
-				title=f":white_check_mark:", 
-				description="")
-			embed.set_footer(text=ctx.user.display_name, icon_url=ctx.user.display_avatar.url)
+		embed: nextcord.Embed = nextcord.Embed(
+			color=EmbedColors.notify,
+			title=f":white_check_mark:", 
+			description="")
+		embed.set_footer(text=ctx.user.display_name, icon_url=ctx.user.display_avatar.url)
+		if count == None or 0:
+			count = None
+		else:
+			count = count
+		print(count)
+		async def default(ctx: Interaction):
+			await ctx.channel.purge(limit=count)
 
-			async def default(ctx: Interaction):
-				await ctx.channel.purge()
-
-			async def User(ctx: Interaction, user:Member):
-				async for message in ctx.channel.history():
-					if message.author == user:
-						await message.delete()
-					else:
-						pass
-
-			async def Channel(ctx:Interaction, channel:GuildChannel):
-				await channel.purge()
-
-			async def ChannelAndUser(ctx: Interaction, channel:GuildChannel, user:Member):
-				async for message in channel.history():
-					if message.author == user:
-						await message.delete()
-					else:
-						pass
-
-			if channel == None:
-				if user == None:
-					await default(ctx)
-					embed.description = f"{ctx.channel.mention} has been purged!"
+		async def User(ctx: Interaction, user:Member):
+			async for message in ctx.channel.history(limit=count):
+				if message.author == user:
+					await message.delete()
 				else:
-					await User(ctx, user)
-					embed.description = f"All messages from {user.mention} have been deleted in {ctx.channel.mention}"
-			elif user == None:
-				if channel == None:
 					pass
+
+		async def Channel(ctx:Interaction, channel:TextChannel):
+			await channel.purge(limit=count)
+
+		async def ChannelAndUser(ctx: Interaction, channel:TextChannel, user:Member):
+			async for message in channel.history(limit=count):
+				if message.author == user:
+					await message.delete()
 				else:
-					await Channel(ctx, channel)
-					embed.description = f"{ctx.channel.mention} has been purged!"
-			elif user and channel != None:
-				await ChannelAndUser(ctx, channel, user)
-				embed.description = f"All messages from {user.mention} have been deleted in {channel.mention}"
-			else:
+					pass
+
+		if channel == None:
+			if user == None:
 				await default(ctx)
 				embed.description = f"{ctx.channel.mention} has been purged!"
-
-
-			msg = await ctx.send(embed=embed)
+			else:
+				await User(ctx, user)
+				embed.description = f"All messages from {user.mention} have been deleted in {ctx.channel.mention}"
+		elif user == None:
+			if channel == None:
+				pass
+			else:
+				await Channel(ctx, channel)
+				embed.description = f"{ctx.channel.mention} has been purged!"
+		elif user and channel != None:
+			await ChannelAndUser(ctx, channel, user)
+			embed.description = f"All messages from {user.mention} have been deleted in {channel.mention}"
 		else:
-			await ctx.send(ephemeral=True, content="You dont have permission to use this command!")
+			await default(ctx)
+			embed.description = f"{ctx.channel.mention} has been purged!"
+
+
+		msg = await ctx.send(embed=embed)
+		time.sleep(1)
 
 
 
 	# Kick command
 	@nextcord.slash_command(name="kick", description="Kick a user from the server", default_permission=False)
 	async def kick(self, ctx: Interaction, user: nextcord.Member, reason):
-		try:
-			await user.kick(reason=reason)
-			kick = nextcord.Embed(
-				color=EmbedColors.notify,
-				title=f":boot: Kicked {user.name}!",
-				description=f"Reason: {reason}\nBy: {ctx.author.mention}")
-			await ctx.send(embed=kick)
-			await user.send(embed=kick)
-		except:
-			pass
+		if user == ctx.user:
+			await ctx.send(ephemeral=True, content=f"{ctx.user.mention} You cannot kick yourself!")
+		else:
+			if ctx.user.guild_permissions.kick_members:
+				try:
+					await user.kick(reason=reason)
+					kick = nextcord.Embed(
+						color=EmbedColors.notify,
+						title=f":boot: Kicked {user.name}!",
+						description=f"Reason: {reason}\nBy: {ctx.user.mention}")
+					await ctx.send(embed=kick)
+					await user.send(embed=kick)
+				except:
+					pass
+			else:
+				await ctx.send(ephemeral=True, content=f"{ctx.user.mention} You do not have permission to kick users!")
 	
-	# Warn user
-	@commands.command()
-	@commands.has_guild_permissions(kick_members=True, moderate_members=True)
-	async def warn(self, ctx, user: nextcord.Member, *reason):
-		reason = " ".join(reason)
-		msg = nextcord.Embed(title=f"{user.name} Warned", color=EmbedColors.success)
-		msg.add_field(name="__Who was warned__", value=user.mention, inline=False)
-		msg.add_field(name="__Who used the warn command__", value=ctx.author.mention, inline=False)
-		msg.add_field(name="__Reason__", value=reason)
-		msg.add_field(name="__Conclusion__", value=f"{ctx.author.mention} warned {user.mention} for {reason}")
-		await ctx.send(embed=msg)
+	
+	@nextcord.slash_command(warn)
 
 		
 
