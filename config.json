@@ -1,0 +1,20 @@
+{
+    "cog list": [
+        "admin",
+        "eventhandlers",
+        "general",
+        "osint",
+        "settings",
+        "testing",
+        "tickets"
+    ],
+    "commands": [
+        "help",
+        "warn",
+        "settings",
+        "testsettings",
+        "sendticket",
+        "close"
+    ],
+    "prefix": "PREFIX"
+}
