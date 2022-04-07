@@ -1,10 +1,9 @@
 # Coded By: Tom Sumner
-# Date: 2020-04-24
-# Github: Tom-Sumner
+# Date: 07-04-2022
+# Github: Tom-Sumner / https://github.com/Tom-Sumner
 # Discord: TSumner#5215
 # License: MIT
 # Note: If you use this code, you MUST credit me in your project.
-
 
 
 import nextcord
