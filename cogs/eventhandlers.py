@@ -80,7 +80,7 @@ class EventHandlers(commands.Cog):
 		async with aiohttp.ClientSession() as session:
 			JoinAlertBot = nextcord.Webhook.from_url(
 				session=session,
-				url="https://discord.com/api/webhooks/951069049566138378/QrGi6IYaYZZMRWqLKZx1Rp6JZFpZ3FUaUx0_SMGiFQk05Vp4jxliVbIdSTsdoAdJ0Wis")
+				url=os.getenv("GUILD_JOIN_WEBHOOK_URL"))
 			await JoinAlertBot.send(embed=embed)
 
 	# Auto delete commands
