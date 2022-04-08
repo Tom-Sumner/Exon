@@ -74,7 +74,7 @@ class SimpleTicket(commands.Cog):
 		await ctx.send("Please confirm to delete the message", view=Confirm(ctx.author))
 
 	@commands.command()
-	@commands.has_guild_permissions(administrator=True)
+	@commands.has_permissions(view_channel=True)
 	async def add(self, ctx, user: nextcord.User):
 		await ctx.send(f"{user.mention} has been added to the ticket")
 		await ctx.channel.set_permissions(user, read_messages=True, send_messages=True, view_channel=True)
