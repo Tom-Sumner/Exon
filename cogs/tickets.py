@@ -31,8 +31,7 @@ class Button(nextcord.ui.View):
 
 		ticket_created_embed = nextcord.Embed(
 			title="Ticket Processed",
-			description=f"""Hey {ctx.user.mention}! Thanks for opening a ticket with us today.
-			Please describe your enquiry and our team will respond shortly. We thank you in advance for your patience."""
+			description=f"""Hey <@!{ctx.user.id}>! Thanks for opening a ticket with us today.\nPlease describe your enquiry and our team will respond shortly. We thank you in advance for your patience."""
 		)
 
 		overwrites = {
