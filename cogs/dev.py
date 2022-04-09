@@ -106,11 +106,12 @@ class DevCommands(commands.Cog):
 		await ctx.author.send(file=nextcord.File("storage.sqlite3"))
 		await ctx.send(f"{ctx.author.mention} Sent you the file.")
 
-	@commands.command(name="update")
+	@commands.command("cls")
 	@commands.is_owner()
-	async def update(self, ctx: Context):
-		channel = await self.client.fetch_channel(936999558582525989)
-		await ctx.send(view=Confirm(channel=channel))
+	async def cls(self, ctx):
+		os.system("cls")
+		await ctx.send(f"{ctx.author.mention} Cleared the terminal.")
+		utils.ready(self.client.user, len(self.client.guilds))
 
 
 
