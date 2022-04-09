@@ -132,7 +132,37 @@ class Admin(commands.Cog):
 				await ctx.send(ephemeral=True, content=f"{ctx.user.mention} You do not have permission to kick users!")
 
 
-		
+	@nextcord.message_command(name="kick", description="Kick a user from the server")
+	async def kick_message(self, ctx: nextcord.Interaction, msg: nextcord.Message):
+		if ctx.user.guild_permissions.kick_members:
+			try:
+				await msg.author.kick(reason=msg.content)
+				kick = nextcord.Embed(
+					color=EmbedColors.notify,
+					title=f":boot: Kicked {msg.author.name}!",
+					description=f"Reason: {msg.content}\nBy: {ctx.user.mention}")
+				await ctx.send(ephemeral=True, embed=kick)
+				await msg.author.send(embed=kick)
+			except:
+				pass
+		else:
+			await ctx.send(ephemeral=True, content=f"{ctx.user.mention} You do not have permission to kick users!")
+	
+	@nextcord.message_command(name="ban", description="Ban a user from the server")
+	async def ban_message(self, ctx: nextcord.Interaction, msg: nextcord.Message):
+		if ctx.user.guild_permissions.ban_members:
+			try:
+				await msg.author.ban(reason=msg.content)
+				ban = nextcord.Embed(
+					color=EmbedColors.notify,
+					title=f":hammer: Banned {msg.author.name}!",
+					description=f"Reason: {msg.content}\nBy: {ctx.user.mention}")
+				await ctx.send(embed=ban)
+				await msg.author.send(embed=ban)
+			except:
+				pass
+		else:
+			await ctx.send(ephemeral=True, content=f"{ctx.user.mention} You do not have permission to ban users!")
 
 
 # Setup the Cog
