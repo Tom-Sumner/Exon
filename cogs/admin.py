@@ -7,8 +7,6 @@
 
 
 
-import re
-from discord import TextChannel
 import nextcord, os, sys, colorama, time, asyncio, json
 from colorama import init, Fore, Back, Style
 from termcolor import colored
@@ -22,6 +20,7 @@ from nextcord.ext import commands
 from nextcord.ext.commands.errors import MissingPermissions, MissingRole, CommandNotFound
 from nextcord import Interaction, SlashOption
 from nextcord.abc import *
+from nextcord import TextChannel
 
 # Define the Cog
 class Admin(commands.Cog):
@@ -131,9 +130,7 @@ class Admin(commands.Cog):
 					pass
 			else:
 				await ctx.send(ephemeral=True, content=f"{ctx.user.mention} You do not have permission to kick users!")
-	
-	
-	@nextcord.slash_command(warn)
+
 
 		
 

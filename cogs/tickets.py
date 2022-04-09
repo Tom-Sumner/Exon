@@ -82,7 +82,6 @@ class SimpleTicket(commands.Cog):
 class Confirm(nextcord.ui.View):
 	def __init__(self, user):
 		super().__init__()
-		self.value = None
 		self.user = user
 
 	@nextcord.ui.button(label="Delete Ticket", style=nextcord.ButtonStyle.red)
