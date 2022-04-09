@@ -2,3 +2,4 @@ nextcord
 colorama
 termcolor
 python-dotenv
+requests
