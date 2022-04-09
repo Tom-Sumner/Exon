@@ -132,7 +132,7 @@ class Admin(commands.Cog):
 				await ctx.send(ephemeral=True, content=f"{ctx.user.mention} You do not have permission to kick users!")
 
 
-	@nextcord.message_command(name="kick")
+	@nextcord.message_command(name="Kick-Member")
 	async def kick_message(self, ctx: nextcord.Interaction, msg: nextcord.Message):
 		if ctx.user.guild_permissions.kick_members:
 			try:
@@ -148,7 +148,7 @@ class Admin(commands.Cog):
 		else:
 			await ctx.send(ephemeral=True, content=f"{ctx.user.mention} You do not have permission to kick users!")
 	
-	@nextcord.message_command(name="ban")
+	@nextcord.message_command(name="Ban-Member")
 	async def ban_message(self, ctx: nextcord.Interaction, msg: nextcord.Message):
 		if ctx.user.guild_permissions.ban_members:
 			try:
