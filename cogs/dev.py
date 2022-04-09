@@ -110,9 +110,7 @@ class DevCommands(commands.Cog):
 	@commands.is_owner()
 	async def update(self, ctx: Context):
 		channel = await self.client.fetch_channel(936999558582525989)
-		# await ctx.send(view=Confirm(channel=channel))
-		m = model(ctx.channel)
-		print(m, type(m))
+		await ctx.send(view=Confirm(channel=channel))
 
 
 
