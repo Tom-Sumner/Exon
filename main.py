@@ -69,14 +69,17 @@ else:
 
 @client.event
 async def on_message(message: nextcord.Message):
-	try:
-		id = message.guild.id
-		if message.content.startswith(dbutils.fetch_prefix(guild_id=id)):
-			await asyncio.sleep(5)
-			await message.delete()
-		await client.process_commands(message)
-	except Exception as e:
-		print("Error	", e)
+	if message.author.bot:
+		pass
+	else:
+		try:
+			id = message.guild.id
+			if message.content.startswith(dbutils.fetch_prefix(guild_id=id)):
+				await client.process_commands(message)
+				await asyncio.sleep(5)
+				await message.delete()
+		except Exception as e:
+			print("Error	", e)
 
 
 CogList = []

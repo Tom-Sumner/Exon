@@ -7,16 +7,19 @@
 
 
 
+from typing import Text
 import nextcord, os, sys, colorama, time, asyncio
 from colorama import init, Fore, Back, Style
 from termcolor import colored
 init()
 sys.path.insert(1, "..")
 import utils, dbutils
-from utils import EmbedColors, Images, pallate, token, tokens, fetch
-from nextcord import slash_command
+from utils import EmbedColors
+from nextcord import InteractionMessage, slash_command, Message
 from nextcord.utils import get
 from nextcord.ext import commands
+from nextcord import TextChannel
+from nextcord.ext.commands import Context
 from nextcord.ext.commands.errors import MissingPermissions, MissingRole, CommandNotFound
 from nextcord import Interaction, SlashOption
 from nextcord.abc import *
@@ -39,17 +42,35 @@ class Button(nextcord.ui.View):
 			ctx.user: nextcord.PermissionOverwrite(view_channel=True),
 			ctx.guild.me: nextcord.PermissionOverwrite(view_channel=True)
 		}
-		count = dbutils.fetch_ticket_count(guild_id=ctx.channel.guild.id)
-		dbutils.update_ticket_count(guild_id=ctx.channel.guild.id, count=count + 1)
+		count = dbutils.fetch_ticket_count(guild_id=ctx.guild_id)
+		dbutils.update_ticket_count(guild_id=ctx.guild_id, count=count + 1)
+		msg: InteractionMessage = ctx.message
 		ticket = await ctx.channel.category.create_text_channel(f"ticket-{count}", overwrites=overwrites)
+		with open(f"{utils.MainCwd}/temp/tickets/{msg.guild.id}-{count}.txt", "a+") as f:
+				f.write(f"""
+{ctx.user.display_name.upper()}#{ctx.user.discriminator}'s ticket transcript
+Created at: {time.strftime("%d/%m/%Y %H:%M")}
+Server: {ctx.guild.name}
 
-		await ticket.send(embed=ticket_created_embed)
+Messages:\n\n""")
+
+		await ticket.send(embed=ticket_created_embed, view=Confirm(ctx.user))
 
 # Define the Cog
 class SimpleTicket(commands.Cog):
-	def __init__(self, client):
+	def __init__(self, client: nextcord.Client):
 		self.client: nextcord.Client = client
 		self.client.persistent_views_added = False
+
+	@commands.Cog.listener()
+	async def on_message(self, msg: Message):
+		if msg.channel.type == nextcord.ChannelType.text:
+			channel: TextChannel = msg.channel
+			if channel.name.startswith("ticket-") and channel.name != "ticket-transcripts":
+				with open(f"{utils.MainCwd}/temp/tickets/{msg.guild.id}-{msg.channel.name.split('-')[1]}.txt", "a+") as f:
+					f.write(f"At: {time.strftime('%d/%m/%Y %H:%M')} - {msg.author.name}: {msg.content}\n")
+			else:
+				pass
 
 	@commands.Cog.listener(name="on_ready")
 	async def on_ready(self):
@@ -59,18 +80,19 @@ class SimpleTicket(commands.Cog):
 
 	@commands.command()
 	@commands.has_permissions(manage_channels=True, administrator=True)
-	async def sendticket(self, ctx):
+	async def sendticket(self, ctx: Context):
 		embed = nextcord.Embed(
 			title="Contact Support",
 			description="Click the button below to open a ticket"
 		)
 		await ctx.send(embed=embed, view=Button())
+		overwrites = {
+			ctx.guild.default_role: nextcord.PermissionOverwrite(view_channel=False),
+			ctx.guild.me: nextcord.PermissionOverwrite(view_channel=True)
+		}
+		await ctx.guild.create_text_channel("ticket-transcripts", overwrites=overwrites, reason="To store all the ticket transcripts")
 
-
-	@commands.command()
-	@commands.has_guild_permissions(administrator=True)
-	async def close(self, ctx):
-		await ctx.send("Please confirm to delete the message", view=Confirm(ctx.author))
+		
 
 	@commands.command()
 	@commands.has_permissions(view_channel=True)
@@ -81,30 +103,19 @@ class SimpleTicket(commands.Cog):
 
 class Confirm(nextcord.ui.View):
 	def __init__(self, user):
-		super().__init__()
+		super().__init__(timeout=None)
 		self.user = user
 
-	@nextcord.ui.button(label="Delete Ticket", style=nextcord.ButtonStyle.red)
+	@nextcord.ui.button(label="Delete Ticket", style=nextcord.ButtonStyle.red, custom_id="close_ticket")
 	async def delete(self, button: nextcord.ui.Button, ctx: nextcord.Interaction):
 		if ctx.user != self.user:
 			await ctx.response.send_message("This is not your choice to make!")
 		channel: nextcord.TextChannel = ctx.channel
-		if channel.name.startswith("ticket"):
-			await ctx.channel.delete()
-			await ctx.response.send_message(f"{channel.mention} is being deleted")
-		else:
-			await ctx.response.send_message("This is not a ticket channel")
-		self.stop()
-
-	@nextcord.ui.button(label="Cancel", style=nextcord.ButtonStyle.green)
-	async def cancel(self, button: nextcord.ui.Button, ctx: nextcord.Interaction):
-		if ctx.user != self.user:
-			await ctx.response.send_message("This is not your choice to make!")
-		channel: nextcord.TextChannel = ctx.channel
-		await ctx.response.send_message("Canceled")
-		await ctx.delete_original_message()
-		
-		self.value = True
+		await ctx.channel.delete()
+		await ctx.response.send_message(f"{channel.mention} is being deleted")
+		transcript_channel: TextChannel = get(ctx.guild.text_channels, name="ticket-transcripts")
+		await transcript_channel.send(file=nextcord.File(f"{utils.MainCwd}/temp/tickets/{ctx.guild.id}-{ctx.channel.name.split('-')[1]}.txt"))
+		os.remove(f"{utils.MainCwd}/temp/tickets/{ctx.guild.id}-{ctx.channel.name.split('-')[1]}.txt")
 		self.stop()
 
 

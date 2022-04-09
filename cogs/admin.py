@@ -27,7 +27,7 @@ class Admin(commands.Cog):
 	def __init__(self, client):
 		self.client: nextcord.Client = client
 
-	@nextcord.slash_command(default_permission=False)
+	@nextcord.slash_command()
 	async def send(self, interaction: nextcord.Interaction):
 		await interaction.response.send_autocomplete()
 
@@ -49,7 +49,7 @@ class Admin(commands.Cog):
 		await webhook.delete()
 
 	# Clear command
-	@nextcord.slash_command(name="purge", description="Delete all messages from a certain user or channel", default_permission=False)
+	@nextcord.slash_command(name="purge", description="Delete all messages from a certain user or channel")
 	async def purge(self, ctx: Interaction, 
 	channel: GuildChannel=SlashOption(name="channel", description="The channel to delete all messages in", required=False),
 	user: Member=SlashOption(name="user", description="The user to delete all messages they sent", required=False),
@@ -112,7 +112,7 @@ class Admin(commands.Cog):
 
 
 	# Kick command
-	@nextcord.slash_command(name="kick", description="Kick a user from the server", default_permission=False)
+	@nextcord.slash_command(name="kick", description="Kick a user from the server")
 	async def kick(self, ctx: Interaction, user: nextcord.Member, reason):
 		if user == ctx.user:
 			await ctx.send(ephemeral=True, content=f"{ctx.user.mention} You cannot kick yourself!")

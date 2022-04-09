@@ -30,7 +30,7 @@ def fetch_guild(guild_id):
 	return result
 
 def default_config(guild_id: int):
-	c.execute(f"insert or ignore into settings values ({guild_id}, '.', null, 'Welcome ;user;, to ;guild;!')")
+	c.execute(f"insert or ignore into settings values ({guild_id}, '.', 'Welcome ;user;, to ;guild;!', 1)")
 	connection.commit()
 	return fetch_guild(guild_id)
 
@@ -73,7 +73,7 @@ def fetch_ticket_count(guild_id: int):
 def fetch_welcome_message(guild_id: int):
 	check(guild_id)
 	result = c.execute(f"select settings.[welcome msg] from settings where id = {guild_id}")
-	message = "".join(tuple(result.fetchone()))
+	message = str(result.fetchone()[0])
 	return message
 
 def update_welcome_message(guild_id: int, message: str):
