@@ -34,14 +34,12 @@ import colorama
 import time
 import asyncio
 import datetime
-import utils, dbutils
 from itertools import cycle
 from colorama import init, Fore, Back, Style
 from termcolor import colored
 from nextcord.ext import commands, tasks
 from nextcord.ext.commands.errors import MissingPermissions, MissingRole, CommandNotFound
 from dotenv import load_dotenv
-from utils import ready
 load_dotenv()
 init()
 
