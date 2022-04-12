@@ -56,10 +56,10 @@ class Admin(commands.Cog):
 			title=f":white_check_mark:", 
 			description="")
 		embed.set_footer(text=ctx.user.display_name, icon_url=ctx.user.display_avatar.url)
-		if count == None or 0:
+		if count == None:
 			count = None
-		else:
-			count = count
+		if channel == None:
+			channel = ctx.channel
 		async def default(ctx: Interaction):
 			amount = await ctx.channel.purge(limit=count)
 			return amount
