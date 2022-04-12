@@ -46,13 +46,13 @@ class Button(nextcord.ui.View):
 		dbutils.update_ticket_count(guild_id=ctx.guild_id, count=count + 1)
 		msg: InteractionMessage = ctx.message
 		ticket = await ctx.channel.category.create_text_channel(f"ticket-{count}", overwrites=overwrites)
-		with open(f"{utils.MainCwd}/temp/tickets/{msg.guild.id}-{count}.txt", "a+") as f:
-				f.write(f"""
-{ctx.user.display_name.upper()}#{ctx.user.discriminator}'s ticket transcript
-Created at: {time.strftime("%d/%m/%Y %H:%M")}
-Server: {ctx.guild.name}
+# 		with open(f"{utils.MainCwd}/temp/tickets/{msg.guild.id}-{count}.txt", "a+") as f:
+# 				f.write(f"""
+# {ctx.user.display_name.upper()}#{ctx.user.discriminator}'s ticket transcript
+# Created at: {time.strftime("%d/%m/%Y %H:%M")}
+# Server: {ctx.guild.name}
 
-Messages:\n\n""")
+# Messages:\n\n""")
 
 		await ticket.send(embed=ticket_created_embed, view=Confirm(ctx.user))
 
@@ -67,8 +67,9 @@ class SimpleTicket(commands.Cog):
 		if msg.channel.type == nextcord.ChannelType.text:
 			channel: TextChannel = msg.channel
 			if channel.name.startswith("ticket-") and channel.name != "ticket-transcripts":
-				with open(f"{utils.MainCwd}/temp/tickets/{msg.guild.id}-{msg.channel.name.split('-')[1]}.txt", "a+") as f:
-					f.write(f"At: {time.strftime('%d/%m/%Y %H:%M')} - {msg.author.name}: {msg.content}\n")
+				# with open(f"{utils.MainCwd}/temp/tickets/{msg.guild.id}-{msg.channel.name.split('-')[1]}.txt", "a+") as f:
+				# 	f.write(f"At: {time.strftime('%d/%m/%Y %H:%M')} - {msg.author.name}: {msg.content}\n")
+				pass
 			else:
 				pass
 
@@ -112,10 +113,13 @@ class Confirm(nextcord.ui.View):
 			await ctx.response.send_message("This is not your choice to make!")
 		channel: nextcord.TextChannel = ctx.channel
 		await ctx.channel.delete()
-		await ctx.response.send_message(f"{channel.mention} is being deleted")
-		transcript_channel: TextChannel = get(ctx.guild.text_channels, name="ticket-transcripts")
-		await transcript_channel.send(file=nextcord.File(f"{utils.MainCwd}/temp/tickets/{ctx.guild.id}-{ctx.channel.name.split('-')[1]}.txt"))
-		os.remove(f"{utils.MainCwd}/temp/tickets/{ctx.guild.id}-{ctx.channel.name.split('-')[1]}.txt")
+		try:
+			await ctx.response.send_message(f"{channel.mention} is being deleted")
+		except:
+			pass
+		# transcript_channel: TextChannel = get(ctx.guild.text_channels, name="ticket-transcripts")
+		# await transcript_channel.send(file=nextcord.File(f"{utils.MainCwd}/temp/tickets/{ctx.guild.id}-{ctx.channel.name.split('-')[1]}.txt"))
+		# os.remove(f"{utils.MainCwd}/temp/tickets/{ctx.guild.id}-{ctx.channel.name.split('-')[1]}.txt")
 		self.stop()
 
 

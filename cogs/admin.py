@@ -27,12 +27,7 @@ class Admin(commands.Cog):
 	def __init__(self, client):
 		self.client: nextcord.Client = client
 
-	@nextcord.slash_command()
-	async def send(self, interaction: nextcord.Interaction):
-		await interaction.response.send_autocomplete()
-
-
-	@send.subcommand(description="Send an embed message to desired channel")
+	@nextcord.slash_command(name="send-embed", description="Send an embed message to desired channel")
 	async def embed(self, ctx: nextcord.Interaction, channel: GuildChannel, 
 		title: str = SlashOption(name="title", description="What should the title of the embed say"), message = SlashOption(name="message",
 		description="The message of the embed")):
@@ -47,13 +42,14 @@ class Admin(commands.Cog):
 		name=ctx.user.display_name)
 		await webhook.send(embed=embed, avatar_url=ctx.user.display_avatar)
 		await webhook.delete()
+		await ctx.send(ephemeral=True, content="Message sent!", embed=embed)
 
 	# Clear command
-	@nextcord.slash_command(name="purge", description="Delete all messages from a certain user or channel")
-	async def purge(self, ctx: Interaction, 
-	channel: GuildChannel=SlashOption(name="channel", description="The channel to delete all messages in", required=False),
-	user: Member=SlashOption(name="user", description="The user to delete all messages they sent", required=False),
-	count: int=SlashOption(name="count", description="The count of messages to delete", required=False)):
+	@nextcord.slash_command(name="clear-channel", description="Delete all messages from a certain user or channel")
+	async def clear(self, ctx: Interaction, 
+		channel: GuildChannel=SlashOption(name="channel", description="The channel to delete all messages in", required=False),
+		user: Member=SlashOption(name="user", description="The user to delete all messages they sent", required=False),
+		count: int=SlashOption(name="count", description="The count of messages to delete", required=False)):
 		await ctx.response.defer(ephemeral=True)
 		embed: nextcord.Embed = nextcord.Embed(
 			color=EmbedColors.notify,
@@ -64,50 +60,54 @@ class Admin(commands.Cog):
 			count = None
 		else:
 			count = count
-		print(count)
 		async def default(ctx: Interaction):
-			await ctx.channel.purge(limit=count)
+			amount = await ctx.channel.purge(limit=count)
+			return amount
 
 		async def User(ctx: Interaction, user:Member):
+			amount = 0
 			async for message in ctx.channel.history(limit=count):
+				amount += 1
 				if message.author == user:
 					await message.delete()
 				else:
 					pass
+			return amount
 
 		async def Channel(ctx:Interaction, channel:TextChannel):
-			await channel.purge(limit=count)
+			amount = await channel.purge(limit=count)
 
 		async def ChannelAndUser(ctx: Interaction, channel:TextChannel, user:Member):
+			amount = 0
 			async for message in channel.history(limit=count):
+				amount += 1
 				if message.author == user:
 					await message.delete()
 				else:
 					pass
+			return amount
 
 		if channel == None:
 			if user == None:
-				await default(ctx)
-				embed.description = f"{ctx.channel.mention} has been purged!"
+				amount = await default(ctx)
+				embed.description = f"Deletd {len(amount)} messages from {channel.mention}"
 			else:
-				await User(ctx, user)
-				embed.description = f"All messages from {user.mention} have been deleted in {ctx.channel.mention}"
+				amount = await User(ctx, user)
+				embed.description = f"Deleted {amount} messages from {user.mention}"
 		elif user == None:
 			if channel == None:
 				pass
 			else:
-				await Channel(ctx, channel)
-				embed.description = f"{ctx.channel.mention} has been purged!"
+				amount = await Channel(ctx, channel)
+				embed.description = f"Deleted {len(amount)} in {channel.mention}"
 		elif user and channel != None:
-			await ChannelAndUser(ctx, channel, user)
-			embed.description = f"All messages from {user.mention} have been deleted in {channel.mention}"
+			amount = await ChannelAndUser(ctx, channel, user)
+			embed.description = f"Deleted {amount} messages from {user.mention} in {channel.mention}"
 		else:
-			await default(ctx)
-			embed.description = f"{ctx.channel.mention} has been purged!"
+			amount = await default(ctx)
+			embed.description = f"Deletd {len(amount)} messages from {channel.mention}"
 
-
-		msg = await ctx.send(embed=embed)
-		time.sleep(1)
+		await ctx.send(embed=embed)
 
 
 
