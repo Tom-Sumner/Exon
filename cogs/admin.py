@@ -76,6 +76,7 @@ class Admin(commands.Cog):
 
 		async def Channel(ctx:Interaction, channel:TextChannel):
 			amount = await channel.purge(limit=count)
+			return amount
 
 		async def ChannelAndUser(ctx: Interaction, channel:TextChannel, user:Member):
 			amount = 0
