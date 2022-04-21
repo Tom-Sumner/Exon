@@ -82,7 +82,7 @@ class EventHandlers(commands.Cog):
 		if msg.author == self.client.user:
 			pass
 		else:
-			if msg.content == f"<@!{self.client.user.id}>":
+			if msg.content == self.client.user.mention:
 				embed2 = nextcord.Embed(color=EmbedColors.success, title="About Exon", description="Current information about Exon")
 				embed2.add_field(name="Uptime", value=f"Exon has been running for {self.client.uptime}")
 				embed2.add_field(name="Amount of servers joined", value=f"Exon is currently serving in {len(self.client.guilds)} servers")
