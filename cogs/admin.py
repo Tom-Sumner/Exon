@@ -1,5 +1,4 @@
-import re
-from discord import TextChannel
+from nextcord import TextChannel
 import nextcord, os, sys, colorama, time, asyncio, json
 from colorama import init, Fore, Back, Style
 from termcolor import colored
@@ -123,11 +122,6 @@ class Admin(commands.Cog):
 			else:
 				await ctx.send(ephemeral=True, content=f"{ctx.user.mention} You do not have permission to kick users!")
 	
-	
-	@nextcord.slash_command(warn)
-
-		
-
 
 # Setup the Cog
 def setup(client):

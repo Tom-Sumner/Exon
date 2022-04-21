@@ -1,3 +1,12 @@
+# Coded By: Tom Sumner
+# Date: 07-04-2022
+# Github: Tom-Sumner / https://github.com/Tom-Sumner
+# Discord: TSumner#5215
+# License: MIT
+# Note: If you use this code, you MUST credit me in your project.
+
+
+
 import aiohttp
 import nextcord, os, sys, colorama, time, asyncio
 from colorama import init, Fore, Back, Style
@@ -22,23 +31,15 @@ class ErrorHandlers(commands.Cog):
 	async def on_command_error(self, ctx, error):
 		if isinstance(error, CommandNotFound):
 			msg = await ctx.send("This command does not exist.")
-			await asyncio.sleep(5)
-			await msg.delete()
 
 		elif isinstance(error, MissingPermissions):
 			msg = await ctx.send(f"You dont have the necessary permissions to run this command\nNeeded perms: {error.missing_permissions}")
-			await asyncio.sleep(5)
-			await msg.delete()
 
 		elif isinstance(error, MissingRole):
 			msg = await ctx.send(f"You dont have the necessary roles to run the command\nNeeded roles: {error.missing_role}")
-			await asyncio.sleep(5)
-			await msg.delete()
 
 		elif isinstance(error, MissingRequiredArgument):
 			msg = await ctx.send(f"{error}")
-			await asyncio.sleep(5)
-			await msg.delete()
 
 		else:
 			await ctx.send("Something went badly wrong while running the command!")
@@ -71,7 +72,7 @@ class EventHandlers(commands.Cog):
 		async with aiohttp.ClientSession() as session:
 			JoinAlertBot = nextcord.Webhook.from_url(
 				session=session,
-				url="https://discord.com/api/webhooks/951069049566138378/QrGi6IYaYZZMRWqLKZx1Rp6JZFpZ3FUaUx0_SMGiFQk05Vp4jxliVbIdSTsdoAdJ0Wis")
+				url=os.getenv("GUILD_JOIN_WEBHOOK_URL"))
 			await JoinAlertBot.send(embed=embed)
 
 	# Auto delete commands
@@ -81,7 +82,7 @@ class EventHandlers(commands.Cog):
 		if msg.author == self.client.user:
 			pass
 		else:
-			if msg.content == f"<@!{self.client.user.id}>":
+			if msg.content == self.client.user.mention:
 				embed2 = nextcord.Embed(color=EmbedColors.success, title="About Exon", description="Current information about Exon")
 				embed2.add_field(name="Uptime", value=f"Exon has been running for {self.client.uptime}")
 				embed2.add_field(name="Amount of servers joined", value=f"Exon is currently serving in {len(self.client.guilds)} servers")

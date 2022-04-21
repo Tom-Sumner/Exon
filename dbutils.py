@@ -21,7 +21,7 @@ def fetch_guild(guild_id):
 	return result
 
 def default_config(guild_id: int):
-	c.execute(f"insert or ignore into settings values ({guild_id}, '.', null, 'Welcome ;user;, to ;guild;!')")
+	c.execute(f"insert or ignore into settings values ({guild_id}, '.', null, 'Welcome ;user;, to ;guild;!', null)")
 	connection.commit()
 	return fetch_guild(guild_id)
 
@@ -49,6 +49,16 @@ def update_prefix(guild_id: int, prefix: str):
 	c.execute(f"update settings set prefix = '{prefix}' where id = {guild_id}")
 	connection.commit()
 
+def update_log_channel(guild_id: int, channel: int):
+	check(guild_id)
+	c.execute(f"update settings set [log channel] = {channel} where id = {guild_id}")
+	connection.commit()
+
+def fetch_log_channel(guild_id: int):
+	check(guild_id)
+	result = c.execute(f"select settings.[log channel] from settings where id = {guild_id}")
+	channel = int(result.fetchone()[0])
+	return channel
 
 def update_ticket_count(guild_id: int, count: int):
 	check(guild_id)
