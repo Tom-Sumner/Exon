@@ -21,7 +21,7 @@ def fetch_guild(guild_id):
 	return result
 
 def default_config(guild_id: int):
-	c.execute(f"insert or ignore into settings values ({guild_id}, '.', null, 'Welcome ;user;, to ;guild;!', null)")
+	c.execute(f"insert or ignore into settings values ({guild_id}, '.', null, 'Welcome ;user;, to ;guild;!', 0)")
 	connection.commit()
 	return fetch_guild(guild_id)
 

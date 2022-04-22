@@ -23,9 +23,13 @@ from nextcord import Interaction, SlashOption
 from nextcord.abc import *
 
 
-async def log(guild_id, type, client: Client, member=None, message=None):
-	channel = await client.fetch_channel(dbutils.fetch_log_channel(guild_id))
-	if channel == None:
+async def log(guild_id, type, client: Client, member=None, message=None, messages=None):
+	channel_id = dbutils.fetch_log_channel(guild_id)
+	try:
+		channel = await client.fetch_channel(channel_id)
+	except:
+		channel = None
+	if channel or channel_id == None or 0:
 		pass
 	else:
 		if type == "join":
@@ -40,12 +44,10 @@ async def log(guild_id, type, client: Client, member=None, message=None):
 		elif type == "unban":
 			embed = Embed(color=EmbedColors.invis, title="Member Unbanned", description=f"{member.mention} has been unbanned.")
 			await channel.send(embed=embed)
-		elif type == "delete":
-			if message.author.bot:
-				pass
-			else:
-				embed = Embed(color=EmbedColors.invis, title="Message Deleted", description=f"{message.author.mention} has deleted a message.")
-				await channel.send(embed=embed)
+		elif type == "bulk":
+			embed = Embed(color=EmbedColors.invis, title="Messages Deleted", description=f"A large amount of messages were deleted")
+			embed.add_field(name="Messages", value=f"{messages}", inline=False)
+			await channel.send(embed=embed)
 		else:
 			pass
 
@@ -70,8 +72,7 @@ class Logging(commands.Cog):
 		
 	@commands.Cog.listener()
 	async def on_raw_bulk_message_delete(self, payload: nextcord.RawBulkMessageDeleteEvent):
-		for msg in payload.messages:
-			await log(msg.guild.id, "delete", self.client, msg)
+		await log(payload.guild_id, "bulk", self.client, payload.cached_messages)
 
 	@commands.Cog.listener()
 	async def on_member_remove(self, member: nextcord.Member):
