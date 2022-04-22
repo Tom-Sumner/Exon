@@ -99,6 +99,7 @@ class EmbedColors:
 	ban = fail
 	kick = error
 	mute = notify
+	invis = 0x37393F
 
 # async def GuildMessageFrame(guild):
 # 	if guild.icon == None:

@@ -29,6 +29,8 @@ async def log(guild_id, type, client: Client, member=None, message=None, message
 		channel = await client.fetch_channel(channel_id)
 	except:
 		channel = None
+	finally:
+		channel = channel
 	if channel or channel_id == None or 0:
 		pass
 	else:
