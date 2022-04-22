@@ -64,24 +64,6 @@ class EmbedColors:
 	mute = notify
 	invis = 0x37393F
 
-# async def GuildMessageFrame(guild):
-# 	if guild.icon == None:
-# 		icon = Images.NullPNG
-# 	else:
-# 		icon = guild.icon
-	
-# 	embed = nextcord.Embed(color=EmbedColors.notify, title=f"I have joined {guild.name}", description=f"About {guild.name}")
-# 	embed.add_field(name="__Name:__", value=guild.name, inline=False)
-# 	embed.add_field(name="__Owner:__", value=f"<@!{guild.owner_id}>", inline=False)
-# 	if guild.description != None:
-# 		embed.add_field(name="__Description__", value=guild.description, inline=False)
-# 	else:
-# 		pass
-# 	embed.add_field(name="__Server Icon__", value="** **", inline=False)
-# 	embed.set_image(url=icon)
-	
-# 	return 
-
 pallate = {
 	"ban": EmbedColors.ban,
 	"kick": EmbedColors.kick,
