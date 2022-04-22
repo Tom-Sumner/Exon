@@ -5,7 +5,16 @@ init()
 sys.path.insert(1, "..")
 import utils, dbutils
 from utils import EmbedColors, Images
-from nextcord import ChannelType, Guild, SelectOption, TextChannel, slash_command, Webhook
+from nextcord import (
+	Button,
+	ChannelType,
+	Guild,
+	Message,
+	SelectOption,
+	TextChannel,
+	slash_command,
+	Webhook
+)
 from nextcord.utils import get
 from nextcord.ext import commands
 from nextcord.ext.commands.errors import MissingPermissions, MissingRole, CommandNotFound
@@ -58,35 +67,33 @@ class EditWelcomeMessage(nextcord.ui.View):
 		self.value = True
 		self.stop()
 
-class SetLogChannel(nextcord.ui.Select):
-	def __init__(self, client, guild: Guild):
-		options = []
-		for chnl in guild.text_channels:
-			if chnl.overwrites_for(guild.default_role).view_channel == False:
-				options.append(SelectOption(label=chnl.name, description=chnl.id, value=chnl.id))
-		super().__init__(placeholder="Select a channel", max_values=1, options=options)
+class SetLogChannel(nextcord.ui.View):
+	def __init__(self, client):
 		self.client = client
-	
-
-	async def callback(self, ctx: Interaction):
-		chnl = self.values[0]
-		dbutils.update_log_channel(ctx.guild.id, chnl)
-		logchnl = await ctx.guild.fetch_channel(chnl)
-		await logchnl.send(embed=nextcord.Embed(
-			color=EmbedColors.notify,
-			title="Log Channel", 
-			description="This channel has been set to Exon's log channel"))
-		await ctx.channel.last_message.delete()
-		await ctx.send(
-			embed=nextcord.Embed(color=EmbedColors.notify,
-			title="Settings",
-			description="Configure settings for this guild"),
-		view=HomeView(self.client))
-
-class SetLogChannelView(nextcord.ui.View):
-	def __init__(self, client, guild):
 		super().__init__()
-		self.add_item(SetLogChannel(client, guild))
+
+	@nextcord.ui.button(label="Change Log", style=nextcord.ButtonStyle.blurple)
+	async def edit(self, button: nextcord.ui.Button, ctx: nextcord.Interaction):
+		if ctx.user.guild_permissions.administrator == False:
+			await ctx.send(embed=nextcord.Embed(color=EmbedColors.error,
+				title="Error",
+				description="You do not have the administrator permission to do this!"))
+		else:
+			await ctx.send("Please type #channelname and send it to set the log channel")
+			channel: Message = await self.client.wait_for("message")
+			chnl = channel.channel_mentions[0].id
+			dbutils.update_log_channel(ctx.guild.id, chnl)
+			logchnl = await ctx.guild.fetch_channel(chnl)
+			await logchnl.send(embed=nextcord.Embed(
+				color=EmbedColors.notify,
+				title="Log Channel", 
+				description="This channel has been set to Exon's log channel"))
+			await ctx.channel.last_message.delete()
+			await ctx.edit_original_message(
+				embed=nextcord.Embed(color=EmbedColors.notify,
+				title="Settings",
+				description="Configure settings for this guild"),
+			view=HomeView(self.client))
 
 class EditPrefix(nextcord.ui.View):
 	def __init__(self, client):
@@ -162,7 +169,7 @@ class Home(nextcord.ui.Select):
 			await ctx.response.edit_message(embed=nextcord.Embed(
 					color=EmbedColors.notify,
 					title="Log Channel",
-					description=f"Change log channel for {ctx.guild.name}"), view=SetLogChannelView(client=self.client, guild=ctx.guild))
+					description=f"Change log channel for {ctx.guild.name}"), view=SetLogChannel(client=self.client))
 		else:
 			pass
 
