@@ -4,6 +4,7 @@
         "dev",
         "eventhandlers",
         "general",
+        "logging",
         "osint",
         "settings",
         "tickets"

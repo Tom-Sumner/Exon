@@ -53,7 +53,7 @@ class EditWelcomeMessage(nextcord.ui.View):
 			embed=nextcord.Embed(color=EmbedColors.notify,
 			title="Settings",
 			description="Configure settings for this guild"),
-		view=HomeView())
+		view=HomeView(self.client))
 		
 		self.value = True
 		self.stop()
@@ -71,7 +71,13 @@ class SetLogChannel(nextcord.ui.Select):
 	async def callback(self, ctx: Interaction):
 		chnl = self.values[0]
 		dbutils.update_log_channel(ctx.guild.id, chnl)
-		await ctx.edit_original_message(
+		logchnl = await ctx.guild.fetch_channel(chnl)
+		await logchnl.send(embed=nextcord.Embed(
+			color=EmbedColors.notify,
+			title="Log Channel", 
+			description="This channel has been set to Exon's log channel"))
+		await ctx.channel.last_message.delete()
+		await ctx.send(
 			embed=nextcord.Embed(color=EmbedColors.notify,
 			title="Settings",
 			description="Configure settings for this guild"),
@@ -177,13 +183,6 @@ class Settings(commands.Cog):
 			title="Settings",
 			description="Configure settings for this guild"),
 		view=HomeView(client=self.client))
-
-	async def wait_for(event, user):
-		result = await Settings.__init__().wait_for(event)
-		if result.author == user:
-			return result
-		else:
-			pass
 
 def setup(client):
 	client.add_cog(Settings(client))

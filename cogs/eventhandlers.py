@@ -15,7 +15,7 @@ init()
 sys.path.insert(1, "..")
 import utils, dbutils
 from utils import EmbedColors, Images
-from nextcord import slash_command
+from nextcord import Embed, slash_command
 from nextcord.utils import get
 from nextcord.ext import commands
 from nextcord.ext.commands.errors import MissingPermissions, MissingRole, CommandNotFound, MissingRequiredArgument
@@ -100,13 +100,6 @@ class EventHandlers(commands.Cog):
 				await msg.channel.send(embeds=[embed1, embed2])
 			else:
 				pass
-	
-	# @commands.Cog.listener()
-	# async def on_member_join(self, member: nextcord.Member):
-	# 	message = dbutils.fetch_welcome_message(member.guild.id)
-	# 	message = message.replace(";user;", member.mention).replace(";guild;", member.guild.name)
-	# 	await member.send(message)
-		
 
 # Setup the Cog
 def setup(client):
