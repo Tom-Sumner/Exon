@@ -1,3 +1,12 @@
+# Coded By: Tom Sumner
+# Date: 07-04-2022
+# Github: Tom-Sumner / https://github.com/Tom-Sumner
+# Discord: TSumner#5215
+# License: MIT
+# Note: If you use this code, you MUST credit me in your project.
+
+
+
 """Exon bot utils
 
 Classes:
@@ -15,13 +24,24 @@ Functions:
 	`fetch()`
 """
 
-import nextcord, os, sys, json
-sys.path.insert(1, "..")
-from nextcord.utils import get
-from nextcord.ext import commands
+
+import nextcord
+import json
+import itertools
+import os
+import sys
+import colorama
+import time
+import asyncio
+import datetime
+from itertools import cycle
+from colorama import init, Fore, Back, Style
+from termcolor import colored
+from nextcord.ext import commands, tasks
 from nextcord.ext.commands.errors import MissingPermissions, MissingRole, CommandNotFound
-from nextcord import Interaction, SlashOption
-from nextcord.abc import GuildChannel
+from dotenv import load_dotenv
+load_dotenv()
+init()
 
 if "Working" in os.listdir(os.getcwd()):
 	CogsCwd = f"{os.getcwd()}/Working/cogs"
@@ -30,6 +50,23 @@ else:
 	CogsCwd = f"{os.getcwd()}/cogs"
 	MainCwd = f"{os.getcwd()}"
 
+
+def ready(user, guilds):
+	line1 = Style.NORMAL + Fore.CYAN + rf"        ┌───────────────────────────────────────────────────┐"
+	line2 = Style.NORMAL + Fore.CYAN + rf"        |      ┌───────┐___   ___   ______   ┌──┐ ┌──┐      |"
+	line3 = Style.NORMAL + Fore.CYAN + rf"        |      |   ____|\  \ /  /  /  __  \  |  \ |  |      |" + Style.NORMAL + Fore.YELLOW + "    User:" + f"{user}"
+	line4 = Style.NORMAL + Fore.CYAN + rf"        |      |  |__    \  V  /  |  |  |  | |   \|  |      |"
+	line5 = Style.NORMAL + Fore.CYAN + rf"        |      |   __|    >   <   |  |  |  | |  . `  |      |"
+	line6 = Style.NORMAL + Fore.CYAN + rf"        |      |  |____  /  .  \  |  `--'  | |  |\   |      |"
+	line7 = Style.NORMAL + Fore.CYAN + rf"        |      |_______|/__/ \__\  \______/  |__| \__|      |" + Style.NORMAL + Fore.YELLOW + "    Guilds Count:" + f"{guilds}"
+	line8 = Style.NORMAL + Fore.CYAN + rf"        |                                                   |"
+	line9 = Style.NORMAL + Fore.CYAN + rf"        └───────────────────────────────────────────────────┘"
+
+	lines = [line1, line2, line3, line4, line5, line6, line7, line8, line9]
+	print(Style.NORMAL + Fore.RED + "\n")
+	for line in lines:
+		print(Style.NORMAL + Fore.RED + line)
+	print(Style.NORMAL + Fore.RED + "\n")
 
 
 class Images:
@@ -62,7 +99,24 @@ class EmbedColors:
 	ban = fail
 	kick = error
 	mute = notify
-	invis = 0x37393F
+
+# async def GuildMessageFrame(guild):
+# 	if guild.icon == None:
+# 		icon = Images.NullPNG
+# 	else:
+# 		icon = guild.icon
+	
+# 	embed = nextcord.Embed(color=EmbedColors.notify, title=f"I have joined {guild.name}", description=f"About {guild.name}")
+# 	embed.add_field(name="__Name:__", value=guild.name, inline=False)
+# 	embed.add_field(name="__Owner:__", value=f"<@!{guild.owner_id}>", inline=False)
+# 	if guild.description != None:
+# 		embed.add_field(name="__Description__", value=guild.description, inline=False)
+# 	else:
+# 		pass
+# 	embed.add_field(name="__Server Icon__", value="** **", inline=False)
+# 	embed.set_image(url=icon)
+	
+# 	return 
 
 pallate = {
 	"ban": EmbedColors.ban,

@@ -13,7 +13,7 @@ from termcolor import colored
 init()
 sys.path.insert(1, "..")
 import utils
-from utils import EmbedColors, Images, pallate, token, tokens, fetch
+from utils import EmbedColors, Images
 from nextcord import slash_command
 from nextcord.utils import get
 from nextcord.ext import commands
