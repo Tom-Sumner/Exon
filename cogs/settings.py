@@ -143,7 +143,7 @@ class Home(nextcord.ui.Select):
 			nextcord.SelectOption(label="Log Channel", description="Change / Set the log channel for this server", emoji="📓", value="log")
 		]
 		
-		super().__init__(placeholder="Select a setting", max_values=1, min_values=1, options=options)
+		super().__init__(placeholder="Select a setting", max_values=1, min_values=1, options=options, row=0)
 	
 	async def callback(self, ctx: Interaction):
 		if self.values[0] == "prefix":
@@ -170,19 +170,24 @@ class HomeView(nextcord.ui.View):
 	def __init__(self, client):
 		super().__init__()
 		self.add_item(Home(client=client))
+	
+	@nextcord.ui.button(label="Finished", style=nextcord.ButtonStyle.blurple, row=1)
+	async def finished(self, button: nextcord.ui.Button, ctx: nextcord.Interaction):
+		await ctx.delete_original_message()
 
 
 class Settings(commands.Cog):
 	def __init__(self, client):
 		self.client: nextcord.Client = client
 
-	@commands.command()
-	async def settings(self, ctx):
-		await ctx.send(
-			embed=nextcord.Embed(color=EmbedColors.notify,
-			title="Settings",
-			description="Configure settings for this guild"),
-		view=HomeView(client=self.client))
+	@slash_command(name="settings", description="Change settings for this server", guild_ids=[941810207804260352])
+	async def settings(self, ctx: Interaction):
+		if not ctx.user.guild_permissions.administrator:
+			await ctx.send(ephemeral=True, content="You need to be an administrator to use this command")
+		else:
+			await ctx.send(
+				embed=nextcord.Embed(title="Settings", description="Configure settings for this guild"),
+				view=HomeView(client=self.client))
 
 def setup(client):
 	client.add_cog(Settings(client))

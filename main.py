@@ -64,8 +64,6 @@ else:
 	command_prefix=dbutils.fetch_prefix,
 	intents=nextcord.Intents.all(), startTime=time.time())
 
-# Remove the default help command
-# client.remove_command("help")
 
 
 @client.event
@@ -100,7 +98,7 @@ for i in client.all_commands:
 
 utils.config({"cog list": CogList, "commands": CommandList})
 
-status = cycle(["/help", "@Exon", "/send embed", "/osint"])
+status = cycle(["@Exon", "/send embed", "/osint"])
 
 @tasks.loop(seconds=10)
 async def change_status():

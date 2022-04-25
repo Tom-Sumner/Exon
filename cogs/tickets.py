@@ -1,11 +1,29 @@
+<<<<<<< Updated upstream
+=======
+# Coded By: Tom Sumner
+# Date: 07-04-2022
+# Github: Tom-Sumner / https://github.com/Tom-Sumner
+# Discord: TSumner#5215
+# License: MIT
+# Note: If you use this code, you MUST credit me in your project.
+
+
+
+from .logging import log
+>>>>>>> Stashed changes
 import nextcord, os, sys, colorama, time, asyncio
 from colorama import init, Fore, Back, Style
 from termcolor import colored
 init()
 sys.path.insert(1, "..")
 import utils, dbutils
+<<<<<<< Updated upstream
 from utils import EmbedColors, Images, pallate, token, tokens, fetch
 from nextcord import slash_command
+=======
+from utils import EmbedColors
+from nextcord import Client, InteractionMessage, slash_command, Message
+>>>>>>> Stashed changes
 from nextcord.utils import get
 from nextcord.ext import commands
 from nextcord.ext.commands.errors import MissingPermissions, MissingRole, CommandNotFound
@@ -13,7 +31,8 @@ from nextcord import Interaction, SlashOption
 from nextcord.abc import *
 
 class Button(nextcord.ui.View):
-	def __init__(self):
+	def __init__(self, client):
+		self.client: Client = client
 		super().__init__(timeout=None)
 
 	@nextcord.ui.button(label="New Ticket", style=nextcord.ButtonStyle.blurple, custom_id="new_ticket")
@@ -34,6 +53,15 @@ class Button(nextcord.ui.View):
 		count = dbutils.fetch_ticket_count(guild_id=ctx.channel.guild.id)
 		dbutils.update_ticket_count(guild_id=ctx.channel.guild.id, count=count + 1)
 		ticket = await ctx.channel.category.create_text_channel(f"ticket-{count}", overwrites=overwrites)
+<<<<<<< Updated upstream
+=======
+		await log(ctx.guild_id, "ticket", self.client, ctx.user)
+# 		with open(f"{utils.MainCwd}/temp/tickets/{msg.guild.id}-{count}.txt", "a+") as f:
+# 				f.write(f"""
+# {ctx.user.display_name.upper()}#{ctx.user.discriminator}'s ticket transcript
+# Created at: {time.strftime("%d/%m/%Y %H:%M")}
+# Server: {ctx.guild.name}
+>>>>>>> Stashed changes
 
 		await ticket.send(embed=ticket_created_embed)
 
@@ -46,7 +74,7 @@ class SimpleTicket(commands.Cog):
 	@commands.Cog.listener(name="on_ready")
 	async def on_ready(self):
 		if not self.client.persistent_views_added:
-			self.client.add_view(Button())
+			self.client.add_view(Button(self.client))
 			self.persistent_views_added = True
 
 	@commands.command()
@@ -56,7 +84,16 @@ class SimpleTicket(commands.Cog):
 			title="Contact Support",
 			description="Click the button below to open a ticket"
 		)
+<<<<<<< Updated upstream
 		await ctx.send(embed=embed, view=Button())
+=======
+		await ctx.send(embed=embed, view=Button(self.client))
+		overwrites = {
+			ctx.guild.default_role: nextcord.PermissionOverwrite(view_channel=False),
+			ctx.guild.me: nextcord.PermissionOverwrite(view_channel=True)
+		}
+		await ctx.guild.create_text_channel("ticket-transcripts", overwrites=overwrites, reason="To store all the ticket transcripts")
+>>>>>>> Stashed changes
 
 
 	@commands.command()

@@ -3,7 +3,10 @@
         "admin",
         "dev",
         "eventhandlers",
+<<<<<<< Updated upstream
         "general",
+=======
+>>>>>>> Stashed changes
         "logging",
         "osint",
         "settings",
@@ -14,10 +17,15 @@
         "database",
         "db",
         "storage",
-        "update",
-        "settings",
+        "cls",
         "sendticket",
         "close",
         "add"
     ]
+<<<<<<< Updated upstream
 }
+=======
+}      "add"
+    ]
+}}
+>>>>>>> Stashed changes

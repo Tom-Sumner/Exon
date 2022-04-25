@@ -23,8 +23,31 @@ from nextcord import Interaction, SlashOption
 from nextcord.abc import *
 
 
+<<<<<<< Updated upstream
 async def log(guild_id, type, client: Client, member=None, message=None):
 	channel = await client.fetch_channel(dbutils.fetch_log_channel(guild_id))
+=======
+
+async def custom(guild_id, client, title, message, ephemeral=False):
+	channel_id = dbutils.fetch_log_channel(guild_id)
+	try:
+		channel = await client.fetch_channel(channel_id)
+	except:
+		channel = None
+	if channel == None:
+		pass
+	else:
+		embed = Embed(title=title, description=message)
+		await channel.send(embed=embed, ephemeral=ephemeral)
+
+	
+async def log(guild_id, type, client: Client, member=None, message=None, messages=None, *args):
+	channel_id = dbutils.fetch_log_channel(guild_id)
+	try:
+		channel = await client.fetch_channel(channel_id)
+	except:
+		channel = None
+>>>>>>> Stashed changes
 	if channel == None:
 		pass
 	else:
@@ -40,16 +63,27 @@ async def log(guild_id, type, client: Client, member=None, message=None):
 		elif type == "unban":
 			embed = Embed(color=EmbedColors.invis, title="Member Unbanned", description=f"{member.mention} has been unbanned.")
 			await channel.send(embed=embed)
+<<<<<<< Updated upstream
 		elif type == "delete":
 			if message.author.bot:
 				pass
 			else:
 				embed = Embed(color=EmbedColors.invis, title="Message Deleted", description=f"{message.author.mention} has deleted a message.")
 				await channel.send(embed=embed)
+=======
+		elif type == "bulk":
+			embed = Embed(color=EmbedColors.invis, title="Messages Deleted", description=f"A large amount of messages were deleted")
+			embed.add_field(name="Messages", value=f"{messages}", inline=False)
+			await channel.send(embed=embed)
+			
+
+		elif type == "ticket":
+			embed = Embed(color=EmbedColors.invis, title="Ticket Created", description=f"{member.mention} has created a ticket.")
+			await channel.send(embed=embed)
+		
+>>>>>>> Stashed changes
 		else:
 			pass
-
-
 
 class Logging(commands.Cog):
 	def __init__(self, client):

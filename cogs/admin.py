@@ -122,6 +122,25 @@ class Admin(commands.Cog):
 			else:
 				await ctx.send(ephemeral=True, content=f"{ctx.user.mention} You do not have permission to kick users!")
 	
+<<<<<<< Updated upstream
+=======
+	@nextcord.message_command(name="Ban Author")
+	async def ban_message(self, ctx: nextcord.Interaction, msg: nextcord.Message):
+		if ctx.user.guild_permissions.ban_members:
+			try:
+				await msg.author.ban(reason=msg.content, delete_message_days=0)
+				ban = nextcord.Embed(
+					color=EmbedColors.notify,
+					title=f":hammer: Banned {msg.author.name}!",
+					description=f"Reason: {msg.content}\nBy: {ctx.user.mention}")
+				await ctx.send(embed=ban)
+				await msg.author.send(embed=ban)
+			except:
+				await ctx.send("Something went wrong!")
+		else:
+			await ctx.send(ephemeral=True, content=f"{ctx.user.mention} You do not have permission to ban users!")
+
+>>>>>>> Stashed changes
 
 # Setup the Cog
 def setup(client):
