@@ -97,6 +97,7 @@ class SetLogChannel(nextcord.ui.View):
 
 class EditPrefix(nextcord.ui.View):
 	def __init__(self, client):
+		self.client = client
 		super().__init__()
 
 	@nextcord.ui.button(label="Edit Prefix", style=nextcord.ButtonStyle.blurple)
