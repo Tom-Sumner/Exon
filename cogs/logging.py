@@ -80,7 +80,7 @@ class Logging(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_member_ban(self, guild: nextcord.Guild, member: nextcord.Member):
-		async for ban in guild.bans(limit=2):
+		async for ban in guild.bans():
 			if ban.user == member:
 				if ban.reason == None:
 					reason = "being an idiot"
