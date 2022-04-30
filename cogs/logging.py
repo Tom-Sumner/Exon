@@ -75,6 +75,7 @@ class Logging(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_member_remove(self, member: nextcord.Member):
+		pass
 		#await log(member.guild.id, "leave", self.client, member)
 
 	@commands.Cog.listener()
