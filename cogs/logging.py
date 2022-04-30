@@ -79,7 +79,7 @@ class Logging(commands.Cog):
 		#await log(member.guild.id, "leave", self.client, member)
 
 	@commands.Cog.listener()
-	async def on_member_ban(self, member: nextcord.Member, guild: nextcord.Guild):
+	async def on_member_ban(self, guild: nextcord.Guild, member: nextcord.Member):
 		async for ban in guild.bans(limit=2):
 			if ban.user == member:
 				if ban.reason == None:
