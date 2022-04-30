@@ -15,7 +15,7 @@ init()
 sys.path.insert(1, "..")
 import utils, dbutils
 from utils import EmbedColors, Images
-from nextcord import Client, Embed, slash_command
+from nextcord import Client, Embed, RawMemberRemoveEvent, slash_command
 from nextcord.utils import get
 from nextcord.ext import commands
 from nextcord.ext.commands.errors import MissingPermissions, MissingRole, CommandNotFound, MissingRequiredArgument
@@ -23,7 +23,7 @@ from nextcord import Interaction, SlashOption
 from nextcord.abc import *
 
 
-async def log(guild_id, type, client: Client, member=None, message=None, messages=None):
+async def log(guild_id, type, client: Client, member=None, message=None, messages=None, reason=None):
 	channel_id = dbutils.fetch_log_channel(guild_id)
 	try:
 		channel = await client.fetch_channel(channel_id)
@@ -39,14 +39,13 @@ async def log(guild_id, type, client: Client, member=None, message=None, message
 			embed = Embed(color=EmbedColors.invis, title="Member Left", description=f"{member.mention} has left the server.")
 			await channel.send(embed=embed)
 		elif type == "ban":
-			embed = Embed(color=EmbedColors.invis, title="Member Banned", description=f"{member.mention} has been banned.")
+			embed = Embed(color=EmbedColors.invis, title="Member Banned", description=f"{member.mention} has been banned for {reason}.")
 			await channel.send(embed=embed)
 		elif type == "unban":
 			embed = Embed(color=EmbedColors.invis, title="Member Unbanned", description=f"{member.mention} has been unbanned.")
 			await channel.send(embed=embed)
 		elif type == "bulk":
 			embed = Embed(color=EmbedColors.invis, title="Messages Deleted", description=f"A large amount of messages were deleted")
-			embed.add_field(name="Messages", value=f"{messages}", inline=False)
 			await channel.send(embed=embed)
 		else:
 			pass
@@ -54,7 +53,7 @@ async def log(guild_id, type, client: Client, member=None, message=None, message
 
 
 class Logging(commands.Cog):
-	def __init__(self, client):
+	def __init__(self, client: Client):
 		self.client: nextcord.Client = client
 
 	@commands.Cog.listener()
@@ -68,19 +67,27 @@ class Logging(commands.Cog):
 				message = dbutils.fetch_welcome_message(member.guild.id)
 				message = message.replace(";user;", member.mention).replace(";guild;", member.guild.name)
 				await member.guild.system_channel.send(message)
-		await log(member.guild.id, "join", self.client, member)
+		#await log(member.guild.id, "join", self.client, member)
 		
 	@commands.Cog.listener()
 	async def on_raw_bulk_message_delete(self, payload: nextcord.RawBulkMessageDeleteEvent):
-		await log(payload.guild_id, "bulk", self.client, payload.cached_messages)
+		await log(payload.guild_id, "bulk", self.client)
 
 	@commands.Cog.listener()
 	async def on_member_remove(self, member: nextcord.Member):
-		await log(member.guild.id, "leave", self.client, member)
+		#await log(member.guild.id, "leave", self.client, member)
 
 	@commands.Cog.listener()
-	async def on_member_ban(self, guild: nextcord.Guild, member: nextcord.Member):
-		await log(guild.id, "ban", self.client, member)
+	async def on_member_ban(self, member: nextcord.Member, guild: nextcord.Guild):
+		async for ban in guild.bans(limit=2):
+			if ban.user == member:
+				if ban.reason == None:
+					reason = "being an idiot"
+				else:
+					reason = ban.reason
+			else:
+				pass
+		await log(guild.id, "ban", self.client, member, reason)
 
 	@commands.Cog.listener()
 	async def on_member_unban(self, guild: nextcord.Guild, member: nextcord.Member):

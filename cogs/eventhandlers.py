@@ -31,15 +31,19 @@ class ErrorHandlers(commands.Cog):
 	async def on_command_error(self, ctx, error):
 		if isinstance(error, CommandNotFound):
 			msg = await ctx.send("This command does not exist.")
+			await msg.delete(delay=10)
 
 		elif isinstance(error, MissingPermissions):
 			msg = await ctx.send(f"You dont have the necessary permissions to run this command\nNeeded perms: {error.missing_permissions}")
+			await msg.delete(delay=10)
 
 		elif isinstance(error, MissingRole):
 			msg = await ctx.send(f"You dont have the necessary roles to run the command\nNeeded roles: {error.missing_role}")
+			await msg.delete(delay=10)
 
 		elif isinstance(error, MissingRequiredArgument):
 			msg = await ctx.send(f"{error}")
+			await msg.delete(delay=10)
 
 		else:
 			await ctx.send("Something went badly wrong while running the command!")
