@@ -59,8 +59,11 @@ async def on_message(message: nextcord.Message):
 				await client.process_commands(message)
 				await asyncio.sleep(5)
 				await message.delete()
-		except:
-			pass
+		except Exception as e:
+			exception_type, exception_object, exception_traceback = sys.exc_info()
+			line_number = exception_traceback.tb_lineno
+			print("Exception:", e)
+			print("Line number: ", line_number)
 
 
 CogList = []
@@ -80,7 +83,7 @@ for i in client.all_commands:
 
 utils.config({"cog list": CogList, "commands": CommandList})
 
-status = cycle(["/help", "@Exon", "/send embed", "/osint"])
+status = cycle(["@Exon", "/send embed", "/osint"] + CommandList)
 
 @tasks.loop(seconds=10)
 async def change_status():
