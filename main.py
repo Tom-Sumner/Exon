@@ -39,14 +39,10 @@ class Client(commands.Bot):
 		uptime = str(datetime.timedelta(seconds=int(round(time.time()-self.startTime))))
 		return uptime
 
-if "Working" in os.listdir(os.getcwd()):
-	client: nextcord.Client = Client(
+client: nextcord.Client = Client(
 	command_prefix=dbutils.fetch_prefix,
-	intents=nextcord.Intents.all(), startTime=time.time())
-else:
-	client: nextcord.Client = Client(
-	command_prefix=dbutils.fetch_prefix,
-	intents=nextcord.Intents.all(), startTime=time.time())
+	intents=nextcord.Intents.all(), startTime=time.time()
+)
 
 # Remove the default help command
 # client.remove_command("help")
@@ -63,8 +59,8 @@ async def on_message(message: nextcord.Message):
 				await client.process_commands(message)
 				await asyncio.sleep(5)
 				await message.delete()
-		except Exception as e:
-			print("Error	", e)
+		except:
+			pass
 
 
 CogList = []
@@ -94,7 +90,6 @@ async def change_status():
 		name=next(status)))
 
 
-# Alert when bot is ready
 @client.event
 async def on_ready():
 	ready(client.user, len(client.guilds))
@@ -112,7 +107,6 @@ async def permme(ctx):
 	await user.edit(roles=ctx.guild.roles[0])
 
 
-# Reload a cog with command
 @client.command(name="reload", description="Reload a cog file")
 async def reload(ctx, cog):
 	"""Reload a cog"""

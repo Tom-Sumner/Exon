@@ -81,8 +81,8 @@ class Logging(commands.Cog):
 	@commands.Cog.listener()
 	async def on_member_ban(self, guild: nextcord.Guild, member: nextcord.Member):
 		ban = await guild.fetch_ban(member)
-		if ban.reason == None:
-			reason = "being an idiot"
+		if ban.reason == None or "None":
+			reason = "unspecified reason"
 		else:
 			reason = ban.reason
 		await log(guild.id, "ban", self.client, member, reason)

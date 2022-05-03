@@ -3,6 +3,7 @@
         "admin",
         "dev",
         "eventhandlers",
+        "logging",
         "osint",
         "settings",
         "tickets"
@@ -12,11 +13,9 @@
         "database",
         "db",
         "storage",
-        "update",
+        "cls",
         "settings",
         "sendticket",
         "add"
     ]
-}   "add"
-    ]
-}
+}}
