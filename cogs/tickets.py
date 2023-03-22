@@ -1,4 +1,4 @@
-# Coded By: Tom Sumner
+# Coded By: Tom Sumner AND Maciej Jasiewicz
 # Date: 07-04-2022
 # Github: Tom-Sumner / https://github.com/Tom-Sumner
 # Discord: TSumner#5215
