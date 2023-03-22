@@ -1,7 +1,7 @@
 # Coded By: Tom Sumner AND Maciej Jasiewicz
 # Date: 07-04-2022
 # Github: Tom-Sumner / https://github.com/Tom-Sumner
-# Discord: TSumner#5215
+# Discord: TSumner#5215 - MJ#2412
 # License: MIT
 # Note: If you use this code, you MUST credit me in your project.
 
